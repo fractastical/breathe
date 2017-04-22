@@ -1,28 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Bootstrap 101 Template</title>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Your Title Here</title>
+        <style type="text/css">
+            html {
+                margin: 0;
+            }
+            body {
+                margin: 40px 0;
+            }
+            .centerer {
+                margin-left: 50%;
+            }
+            .centered {
+                margin-left: -400px;
+                width: 800px;
+            }
 
-    <!-- Bootstrap -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
+            .content {
+            }
+        </style>
+        <link rel="stylesheet" type="text/css" href="https://cdn.ethers.io/scripts/dashboard-v0.1.css">
+    </head>
+    <body>
+        <div class="centerer">
+            <div class="centered">
+                <div class="content">
+                    Hello <span id="address">World</span>!
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript" src="https://cdn.ethers.io/scripts/ethers-app-v0.2.min.js"></script>
+        <script type="text/javascript" src="https://cdn.ethers.io/scripts/dashboard-v0.1.js"></script>
+        <script type="text/javascript">
 
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-  </head>
-  <body>
-    <h1>Hello, world!</h1>
+            ethers.onready = function() {
+                console.log('Ready!');
+            };
 
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="js/bootstrap.min.js"></script>
-  </body>
+            // Update the account address
+            function updateAccount(address) {
+
+                // No address means the user has no accounts
+                if (!address) {
+                    address = 'World';
+                }
+
+                var span = document.getElementById('address');
+
+                if (span) {
+                    span.textContent = address;
+                }
+            }
+
+            // Get the current account
+            ethers.getAccount().then(function(address){
+                updateAccount(address);
+            });
+
+            // Whenever the account changes...
+            ethers.onaccount = updateAccount;
+        </script>
+    </body>
 </html>
+
