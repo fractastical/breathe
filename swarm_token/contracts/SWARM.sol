@@ -40,7 +40,7 @@ contract SWARM is ERC20, SafeMath, Ownable {
     initialSupply = 100000000 * (10 ** decimals);
     totalSupply = initialSupply;
     balances[msg.sender] = initialSupply;// Give the creator all initial tokens                    
-    name = 'SWARM Bitjob Token';        // Set the name for display purposes     
+    name = 'SWARM Token';        // Set the name for display purposes     
     symbol = 'SWARM';                       // Set the symbol for display purposes  
     decimals = 6;                        // Amount of decimals for display purposes
   }
