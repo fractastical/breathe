@@ -56,7 +56,7 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
 
 	uint public SWARM_reserve;	// amount of the contingency reserve	
 	uint public etherInvestors; // number of investors who used ether
-	uint public bitcoinInvestors; // number of investors who used bitcoin
+    uint public bitcoinInvestors; // number of investors who used bitcoin
     uint multiplier = 10000000000; // to provide 10 decimal values
 
 	mapping(address => Investor) public investors; //investorsETH indexed by their ETH address
