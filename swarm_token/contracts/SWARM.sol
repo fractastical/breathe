@@ -37,7 +37,7 @@ contract SWARM is ERC20, SafeMath, Ownable {
 
 
      // One hundred million coins, each divided to up to 10^decimals units.
-    initialSupply = 100000000 * (10 ** decimals);
+    initialSupply = 20000000 * (10000000000);
     totalSupply = initialSupply;
     balances[msg.sender] = initialSupply;// Give the creator all initial tokens                    
     name = 'SWARM Bitjob Token';        // Set the name for display purposes     
