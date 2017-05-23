@@ -6,7 +6,7 @@ import "./Pausable.sol";
 
 
 //Crowdsale Smart Contract for the SWARM project
-  //This smart contract collects ETH and BTC, and in return sends SWARM tokens to the investors
+//This smart contract collects ETH and BTC, and in return sends SWARM tokens to the investors
   
 
 
@@ -22,12 +22,12 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
 	}
 
 	// to store ambasador referral info
-    struct Sponsor{
+ 	struct Sponsor{
 
-        address referral;       // address of ambasador
-		uint weiReferred;		// amount of ETH contributed by referrral
-		uint satoshiReferred;	// amount of BTC contributed by referral	
-		bool isAmbassador;		// true if ambasador, otherwise affiliate
+        address referral;       // address of investor
+		uint weiReferred;       // amount of ETH contributed by investor
+		uint satoshiReferred;	// amount of BTC contributed by investor	
+		bool isAmbassador;      // true if ambasador, otherwise affiliate
 		uint tokensSent;        // number of tokens sent to the affiliate
 	}
 	
@@ -41,9 +41,9 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
 	uint public BTCReceived;    // Number of BTC received
 	uint public SWARMSentToETH;	// Number of SWARM sent to ETH contributors
 	uint public SWARMSentToBTC;	// Number of SWARM sent to BTC contributors
-    uint public SWARMSentToRef; // Number of SWARM sent to sponsors
+	uint public SWARMSentToRef; // Number of SWARM sent to sponsors
 	uint public startBlock;     // Crowdsale start block
-	uint public endBlock;       // C/**/rowdsale end block
+	uint public endBlock;       // Crowdsale end block
 	uint public minCap;         // Minimum number of SWARM to sell 
 	uint public maxCap;         // Maximum number of SWARM to sell
 	bool public maxCapReached;  // Max cap has been reached
@@ -56,29 +56,29 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
 	address public team;		// address at which the team SWARM will be sent
 
 	uint public SWARM_reserve;	// amount of the contingency reserve	
-	uint public etherInvestors; // number of investors who used ether
-	uint public bitcoinInvestors; // number of investors who used bitcoin
-    uint multiplier = 10000000000; // to provide 10 decimal values
+	uint public etherInvestors; 	// number of investors who used ether
+	uint public bitcoinInvestors; 	// number of investors who used bitcoin
+	uint multiplier = 10000000000; 	// to provide 10 decimal values
 
 	mapping(address => Investor) public investors; //investorsETH indexed by their ETH address
 	mapping(address => Sponsor) public sponsors;
 
-    /// onlyBy()
+	/// @dev onlyBy()
 	/// @notice to be used when certain account is required to access the function 
-    /// @param a {address}  The address of the authorised individual   
+	/// @param a {address}  The address of the authorised individual   
 	modifier onlyBy(address a){
 		if (msg.sender != a) throw;  
 		_;
 	}
 
-	/// minCapNotReached
+	/// @dev minCapNotReached
 	/// @notice to verify if deadline has passed and minimum cap hasn't been reacched        
 	modifier minCapNotReached() {
 		if ((now<endBlock) || SWARMSentToETH + SWARMSentToBTC >= minCap ) throw;
 		_;
 	}
 
-	/// respectTimeFrame
+	/// @dev respectTimeFrame
 	/// @notice to verify if action is not performed out of the campaing range    
 	modifier respectTimeFrame() {
 		if ((now < startBlock) || (now > endBlock )) throw;
@@ -91,29 +91,28 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
 	event ReceivedETH(address investor, uint amount, uint tokenAmount);
 	event ReceivedBTC(address investor, string from, uint amount, string txid, uint tokenAmount);
 	event RefundBTC(string to, uint value);
-    event ReferralProcessed(address member, address referral, uint amount, uint256 btcOrEth, bool ambasador, uint tokensEarned);
+	event ReferralProcessed(address member, address referral, uint amount, uint256 btcOrEth, bool ambasador, uint tokensEarned);
 	
 
 	/// Crowdsale  {constructor}
 	/// @notice fired when contract is crated. Initilizes all constnat variables.     
 	function Crowdsale(SWARM SWARMaddress) {
-
-
+	
 		owner = msg.sender;
 		BTCproxy = 0xa972ed74b34aE1D99713349c997f558f9B50C8D1;
 		//swarm = SWARM(0xfb0CAa5A324E5a878c8bC98CE1430976992A964c);
-        swarm = SWARMaddress;
+		swarm = SWARMaddress;
 		multisigETH = 0x0000000000000000000000000000000000;
 		team = 0x0000000000000000000000000000000000;
 		reserve = 0x0000000000000000000000000000000000;		
 		SWARMSentToETH = 0;        
 		SWARMSentToBTC = 0;
-        SWARMSentToRef = 0;
+		SWARMSentToRef = 0;
 		minInvestETH = 1 ether;
-		minInvestBTC = 5000000;				// approx 50 USD or 0.05000000 BTC
-		startBlock = 0 ;            		// should wait for the call of the function start
-		endBlock =  0;  					// should wait for the call of the function start
-		weiToSatoshi = 143287209000;	    // will be update every 10min based on the exchnage value externally
+		minInvestBTC = 5000000;		// approx 50 USD or 0.05000000 BTC
+		startBlock = 0 ;		// should wait for the call of the function start
+		endBlock =  0;			// should wait for the call of the function start
+		weiToSatoshi = 143287209000;	// will be update every 10min based on the exchnage value externally
 		minCap=12000000 * multiplier;	    
 		maxCap=20000000 * multiplier;		
 		SWARM_reserve=170000 * multiplier;	// max 6000000 SWARM to be discussed			
@@ -121,19 +120,24 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
 
 
 
-	/// {fallback function}  
+	/// @dev {fallback function}  
 	/// @notice It will call internal function which handels allocation of Ether and calculates SWARM tokens.   
 	function() payable {
 		if (now > endBlock) throw;
-		handleETH(msg.sender, 0x0, false);
+		    handleETH(msg.sender, 0x0, false);
 	}
 
-
-    function payThroghRef(address _sponsor, bool _isAmbassador) payable returns (bool){
+	/// @dev payThroghRef
+	/// @notice It will be used through web3 access when sponsor info is available
+	/// @param _sponsor {address} 
+	/// @param _isAmbassador {bool} true if sponsor is an amabassador, false if affiliate
+	/// @return 
+    	function payThroghRef(address _sponsor, bool _isAmbassador) payable returns (bool res){
         	if (now > endBlock) throw;
 		     handleETH(msg.sender, _sponsor, _isAmbassador);
+		return res;
         
-    }
+    	}
 	
 	
 	/// start 
@@ -145,14 +149,13 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
 
     
 
-    
-
 	/// handleETH 
 	/// @notice It will be called by fallback function whenever ether is sent to it
 	/// @param   _investor {address} address of beneficiary
 	/// @return res {bool} true if transaction was successful
-	function handleETH(address _investor, address _sponsor, bool _ambasador) internal  stopInEmergency  respectTimeFrame returns (bool res) {
-   // function handleETH(address _investor, address _sponsor, bool _ambasador) payable returns (bool res) {
+
+		function handleETH(address _investor, address _sponsor, bool _ambasador) internal  stopInEmergency  respectTimeFrame returns (bool res) {
+   
 		if (msg.value < minInvestETH) throw;								    	// stop when required minimum is not sent
 	
         uint SWARMToSend = computeTokensToSend(safeDiv(msg.value, weiToSatoshi)) ; 	// compute the number of SWARM to send based on converted ETH to BTC
@@ -196,8 +199,7 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
 	/// @param _amount {uint} amount of BTC sent
 	/// @param _transactionID {string} BTC
 	/// @return res {bool} true if transaction was successful
-	   function handelBTC(address _investor, string _addressBTC, uint _amount, string _transactionID, address _sponsor, bool _isAmbassador) stopInEmergency respectTimeFrame onlyBy(BTCproxy) returns (bool res){
-      //  function handelBTC(address _investor, string _addressBTC, uint _amount, string _transactionID, address _sponsor, bool _isAmbassador) stopInEmergency respectTimeFrame  returns (bool res){
+	 function handelBTC(address _investor, string _addressBTC, uint _amount, string _transactionID, address _sponsor, bool _isAmbassador) stopInEmergency respectTimeFrame onlyBy(BTCproxy) returns (bool res){    
 		if (_amount < minInvestBTC) throw;												// verification also made on BTC proxy side
         
 
@@ -230,6 +232,18 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
 		ReceivedBTC(_investor, _addressBTC, BTCReceived, _transactionID, SWARMToSend);
 		return true;																	// register event
 	}
+
+
+
+	/// @dev computeTokensToSend() 
+	/// @notice It will compute amount of tokens to be sent to sponsor
+	/// @param _sponsor {address} sponsor's account
+    /// @param _referral {address} adderss of investor
+	/// @param _amount {uint} amount of satoshi sent 
+	/// @param _paymentType {uint256} BTC or ETH
+	/// @param _isAmbassador {bool} true if sponsor is Ambassador, false ir regular afiliate
+	/// @param _tokensSent {uint} amount of tokens purchased by investor
+	/// @return  res {bool} true if completed successfully
 
     function handleReferral(address _sponsor, address _referral, uint _amount, uint256 _paymentType, bool _isAmbassador, uint _tokensSent) internal returns (bool){
 
@@ -279,17 +293,15 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
 
 
 
-    /// computeTokensToSend() 
+	/// computeTokensToSend() 
 	/// @notice It will compute amount of tokens to be sent in exchange for payment
 	/// @param _amount {uint} amount of satoshi
 	/// @return  res {uint} token amount representing sale
-	//function computeTokensToSend(uint amount) internal constant returns (uint res) {
+
        function computeTokensToSend(uint _amount) internal constant returns (uint res) {
 
 		uint totalTokenSold = SWARMSentToETH + SWARMSentToBTC;
 		uint tokenPriceSatoshi ;
-		uint tokenAmount;
-		
 		
 	
 		
@@ -310,15 +322,15 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
         else tokenPriceSatoshi = 780000;
         
 		
-        tokenAmount = _amount * multiplier  /tokenPriceSatoshi;
-		return tokenAmount;
+        res = _amount * multiplier  /tokenPriceSatoshi;
+		return res;
 	}
 
-    /// receiveApproval() 
+	/// receiveApproval() 
 	/// @notice When mincap is not reached, investor can call the approveAndCall() funcgtion of 
-    /// the swarm contract in order to be refunded. 
+    	/// the swarm contract in order to be refunded. 
 	/// @param _from {address} address of the investor
-    /// @param _value {uint256} amount to be refunded	
+    	/// @param _value {uint256} amount to be refunded	
 	function receiveApproval(address _from, uint256 _value) minCapNotReached public {
 		if (msg.sender != address(swarm)) throw; 		                    // ensure that only swarm contract can call this function
 		if (_value != investors[_from].SWARMSent) throw;                    // compare passed value with the investor balance
@@ -337,7 +349,7 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
 
 
 
-    /// setEthToBtcRate() 
+	/// setEthToBtcRate() 
 	/// @notice This functin will be called externally every 10 munitues to update ETH/BTC ratio
 	/// @param _rate {uint} new rate to set  	
 	function setEthToBtcRate(uint _rate) onlyBy(BTCproxy) {
@@ -345,10 +357,10 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
 	}
 	
 
-    /// finalize() 
+	/// finalize() 
 	/// @notice This function will finalize the sale. 
-    /// it will only execute if predetermined sale time passed. 
-    /// it is also giving 15 days investors to withdraw refunds in case minCap hasn't been reached.	
+	/// it will only execute if predetermined sale time passed. 
+	/// it is also giving 15 days investors to withdraw refunds in case minCap hasn't been reached.	
 	function finalize() onlyBy(owner) {
 		// check
 		if (SWARMSentToETH + SWARMSentToBTC <= maxCap  && now < endBlock) throw;	// Can only be finilized if 30 days passed
