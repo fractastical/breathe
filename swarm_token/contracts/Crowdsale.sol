@@ -22,7 +22,7 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
 	}
 
 	// to store ambasador referral info
- struct Sponsor{
+    struct Sponsor{
 
         address referral;       // address of ambasador
 		uint weiReferred;		// amount of ETH contributed by referrral
