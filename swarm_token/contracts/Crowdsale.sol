@@ -154,20 +154,18 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
 	/// @param   _investor {address} address of beneficiary
 	/// @return res {bool} true if transaction was successful
 
-		function handleETH(address _investor, address _sponsor, bool _ambasador) internal  stopInEmergency  respectTimeFrame returns (bool res) {
+	function handleETH(address _investor, address _sponsor, bool _ambasador) internal  stopInEmergency  respectTimeFrame returns (bool res) {
    
-		if (msg.value < minInvestETH) throw;								    	// stop when required minimum is not sent
+		if (msg.value < minInvestETH) throw;					// stop when required minimum is not sent
 	
-        uint SWARMToSend = computeTokensToSend(safeDiv(msg.value, weiToSatoshi)) ; 	// compute the number of SWARM to send based on converted ETH to BTC
-
+        	uint SWARMToSend = computeTokensToSend(safeDiv(msg.value, weiToSatoshi)) ; 	// compute the number of SWARM to send based on converted ETH to BTC
        	
+        	if (_sponsor != 0x0 && !_ambasador) {
+             		uint referralTokenToSend = safeDiv( safeMul(SWARMToSend, 2 ) , 100); // add 2% bonus for using referral link
+             		SWARMToSend = safeAdd(SWARMToSend, referralTokenToSend );
+        	}
 
-        if (_sponsor != 0x0 && !_ambasador) {
-             uint referralTokenToSend = safeDiv( safeMul(SWARMToSend, 2 ) , 100); // add 2% bonus for using referral link
-             SWARMToSend = safeAdd(SWARMToSend, referralTokenToSend );
-        }
-
-        if (safeAdd(SWARMToSend, safeAdd(SWARMSentToRef, safeAdd(SWARMSentToETH, SWARMSentToBTC))) > maxCap)  // ensure that max cap hasn't been reached
+        	if (safeAdd(SWARMToSend, safeAdd(SWARMSentToRef, safeAdd(SWARMSentToETH, SWARMSentToBTC))) > maxCap)  // ensure that max cap hasn't been reached
 			throw;
 		
 
@@ -181,10 +179,10 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
 		SWARMSentToETH = safeAdd(SWARMSentToETH, SWARMToSend);
 		etherInvestors ++;                                                  		// keep count of investors       
 
-        if (_sponsor != 0x0){
-            handleReferral( _sponsor, _investor, msg.value, 1, _ambasador, SWARMToSend);
-        if (investor.sponsor == 0x0 ) investor.sponsor = _sponsor;                 // update sponsor recrod only once  
-       }
+        	if (_sponsor != 0x0){
+            		handleReferral( _sponsor, _investor, msg.value, 1, _ambasador, SWARMToSend);
+        		if (investor.sponsor == 0x0 ) investor.sponsor = _sponsor;                 // update sponsor recrod only once  
+       		}
         
 		
 		ReceivedETH(_investor,msg.value, SWARMToSend );									    // register event
@@ -238,7 +236,7 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
 	/// @dev computeTokensToSend() 
 	/// @notice It will compute amount of tokens to be sent to sponsor
 	/// @param _sponsor {address} sponsor's account
-    /// @param _referral {address} adderss of investor
+    	/// @param _referral {address} adderss of investor
 	/// @param _amount {uint} amount of satoshi sent 
 	/// @param _paymentType {uint256} BTC or ETH
 	/// @param _isAmbassador {bool} true if sponsor is Ambassador, false ir regular afiliate
