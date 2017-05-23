@@ -1,5 +1,5 @@
 import "./SafeMath.sol";
-import "./RLC.sol";
+import "./SWARM.sol";
 import "./PullPayment.sol";
 import "./Pausable.sol";
 
@@ -378,7 +378,7 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
 
 
     /// drain() 
-	/// @notice Failsafe drain 
+    /// @notice Failsafe drain 
 	function drain() onlyBy(owner) {
 		if (!owner.send(this.balance)) throw;
 	}
