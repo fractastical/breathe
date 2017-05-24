@@ -276,10 +276,7 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
         else sponsor.satoshiReferred = _amount; 
 
         sponsor.tokensSent = tokensToSend;  
-        SWARMSentToRef  = safeAdd(SWARMSentToRef, tokensToSend);
-
-        SWARMSentToETH = safeAdd(SWARMSentToETH, tokensToSend);
-
+        SWARMSentToRef  = safeAdd(SWARMSentToRef, tokensToSend);       
 
         if (!swarm.transfer(_sponsor, tokensToSend)) throw; 
        
@@ -298,7 +295,7 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
 
        function computeTokensToSend(uint _amount) internal constant returns (uint res) {
 
-		uint totalTokenSold = SWARMSentToETH + SWARMSentToBTC;
+		uint totalTokenSold = safeAdd(safeAdd(SWARMSentToETH , SWARMSentToBTC) , SWARMSentToRef);
 		uint tokenPriceSatoshi ;
 		
 	
@@ -306,7 +303,7 @@ contract Crowdsale is SafeMath, PullPayment, Pausable {
        if (totalTokenSold <= (2500000 * multiplier) )
                 tokenPriceSatoshi = 6700;
         else if (totalTokenSold > (2500000 * multiplier) && totalTokenSold <=  (5000000 * multiplier))
-                tokenPriceSatoshi = 33000;
+                tokenPriceSatoshi = 33300;
         else if (totalTokenSold > (5000000 * multiplier) && totalTokenSold <=  (7500000* multiplier))
                 tokenPriceSatoshi = 80000;
         else if (totalTokenSold > (7500000 * multiplier) && totalTokenSold <=  (10000000* multiplier))
