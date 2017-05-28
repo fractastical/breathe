@@ -161,6 +161,48 @@ function renderDashBoard() {
         });
 }
 
+// update swarmToSatoshi
+const url = "https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=ETH"
+// Make a call to CryptoCompare API to
+// find out how many ETH per BTC
+function retrieveEthToBtcRate(url){
+    // Fetch the API url
+    fetch(url).then(function(response) {
+        return response.json();
+    }).then(function(data) {
+        // Log the ETH per BTC for dev purposes
+      console.log(data.ETH);
+    }).catch(function() {
+        // TODO: Address the case when API call fails
+    });
+}
+
+// Convert ETH to Wei
+function ethToWei(amount){
+    web3.toWei(amount, 'ether')
+}
+
+// Run setEthToBtcRate() (Crowdsale.sol) to
+// update the conversion rate
+function updateEthToBtcRate(rate){
+    crowdFundingHandle.setEthToBtcRate(rate)
+};
+
+var CronJob = require('cron').CronJob;
+// Update the weiToSatoshi rate every 10 minutes
+var job = new CronJob('*/10 * * * *', function() {
+      console.log("Starting weiToSatoshi update cron... (every 10 mins)")
+      const amount = retrieveEthToBtcRate(url);
+      const wei = ethToWei(amount);
+      updateEthToBtcRate(wei);
+    }, function () {
+        //TODO: Code for after the job runs
+    },
+    true, // Start the job right now
+    timeZone // Time zone of this job
+);
+
+
 function calculateSWARMPrice(totalTokensSold) {
     var tokenPriceSatoshi;
 
