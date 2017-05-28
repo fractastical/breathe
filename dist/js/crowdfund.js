@@ -10,14 +10,13 @@ var web3;
 var gasPrice;
 var gasAmount;
 var exchangeUSD;
-var SWARM_PriceBTC; 
+var SWARM_PriceBTC;
 var SWARM_PriceETH;
 var SWARM_PriceUSD;
 var actionButton;
 
 
 function init() {
-
     var proposal,
         mode,
         newProposalInput,
@@ -28,17 +27,12 @@ function init() {
         rulesChangeButton,
         investButton;
 
-
     currAccount = getCookie("account");
-
 
     $("#title-brand").text(organizationName);
     $("#page-title").text(organizationName);
     $("#logo-title-link").html('<a href="http://' + domain + '" class="simple-text">' + organizationName + ' </a>');
     $("#logo-mini-link").html('<a href="http://' + domain + '" class="simple-text">' + organizationName + ' </a>');
-
-
-
 
     // Checks Web3 support
     if (typeof web3 !== 'undefined' && typeof Web3 !== 'undefined') {
@@ -56,25 +50,19 @@ function init() {
             return;
         }
     } else if (typeof web3 == 'undefined' && typeof Web3 == 'undefined') {
-
         Web3 = require('web3');
         web3 = new Web3();
-        web3.setProvider(new web3.providers.HttpProvider(onnectionString));
+        web3.setProvider(new web3.providers.HttpProvider(connectionString));
     }
-
 
     gasPrice = web3.eth.gasPrice;
     gasAmount = 4000000;
 
-
-    crowdFundingContrat = web3.eth.contract(crowdFundingABI);
+    crowdFundingContract = web3.eth.contract(crowdFundingABI);
     crowdFundingHandle = crowdFundingContrat.at(crowdFundingAddress);
 
-    swarmTokenContract = web3.eth.contract(toeknContractABI);
+    swarmTokenContract = web3.eth.contract(tokenContractABI);
     swarmTokenHandle = swarmTokenContract.at(tokenContractAddress);
-
-
-
 
     //gasPrice = web3.eth.gasPrice;
     gasPrice = 20000000000;
@@ -83,24 +71,15 @@ function init() {
     currAccount = adminAccount;
 
     renderPage();
-
-
-
 }
 
 
 function renderPage() {
-
     if (window.location.href.indexOf("index.html") > 0) renderDashBoard();
-
 }
 
 
 function renderDashBoard() {
-
-
-
-
     // calculate number of tokens owned by logged user
     var tokenBalance = swarmTokenHandle.balanceOf(currAccount) / Math.pow(10, 10);
 
@@ -108,7 +87,6 @@ function renderDashBoard() {
     $("#token-balance").html("<b>You hold " + tokenBalance + " SWARM</b>")
 
     // calculate nuymber of days left for crowd funding
-
     var daysLeft = convertTimestamp(crowdFundingHandle.endBlock());
 
     var today = new Date();
@@ -120,16 +98,11 @@ function renderDashBoard() {
     $("#days-left").html(dayDifference);
 
     // calculate number of participants so far
-
     var numberOfInvestors = Number(crowdFundingHandle.etherInvestors()) + Number(crowdFundingHandle.bitcoinInvestors());
 
     $("#investors-number").html(numberOfInvestors);
 
-
-
-
     // calculate USD received
-
     $.get("https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=USD",
         function (data, status) {
             if (status == "success") {
@@ -138,7 +111,6 @@ function renderDashBoard() {
 
                 exchangeUSD = data.USD;
 
-
                 $.get("https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=ETH",
                     function (data, status) {
                         if (status == "success") {
@@ -146,11 +118,9 @@ function renderDashBoard() {
                             // var length = Object(myObj).length;
 
                             var exchangBTC_ETH = data.ETH;
-
                             var exchangeETH_BTC = 1 / exchangBTC_ETH;
 
-                            // draw timline
-
+                            // draw timeline
                             var tokensEther = Number(crowdFundingHandle.SWARMSentToETH());
                             var tokensBitcoin = Number(crowdFundingHandle.SWARMSentToBTC());
                             var toknesReferres = Number(crowdFundingHandle.SWARMSentToRef());
@@ -165,9 +135,7 @@ function renderDashBoard() {
                             bar.barIndicator('loadNewData', [newData]);
                             bar.barIndicator('reanimateBar');
 
-
                             // calculate current SWARM price
-
                             SWARM_PriceBTC = calculateSWARMPrice(totalTokensSold);
                             SWARM_PriceETH = SWARM_PriceBTC * exchangBTC_ETH;
                             SWARM_PriceUSD = SWARM_PriceBTC * exchangeUSD;
@@ -177,12 +145,7 @@ function renderDashBoard() {
                             $("#price-btc").text((SWARM_PriceBTC).formatMoney(6, '.', ','));
                             $("#price-usd").text((SWARM_PriceUSD).formatMoney(6, '.', ','));
 
-
-
-
-
                             // calculate BTC received
-
                             var BTCReceived = crowdFundingHandle.BTCReceived() / Math.pow(10, 8);
                             var BTCFromETH = crowdFundingHandle.ETHReceived() * exchangeETH_BTC / Math.pow(10, 18);
 
@@ -191,35 +154,15 @@ function renderDashBoard() {
 
 
                             $("#btc-received").html((totalBTC).formatMoney(5, '.', ',') + " BTC");
-
                             $("#usd-received").html((totalUSD).formatMoney(2, '.', ',') + " USD invested so far.");
-
-
                         }
                     });
             }
         });
-
-
-
-
-
-
-
-
-
-
-
 }
 
-
-
 function calculateSWARMPrice(totalTokensSold) {
-
     var tokenPriceSatoshi;
-
-
-
 
     if (totalTokensSold <= (2500000))
         tokenPriceSatoshi = 6700;
@@ -242,23 +185,13 @@ function calculateSWARMPrice(totalTokensSold) {
 
 
 function showSendingAddress(){
-
-
     $("#areYouSure").modal('toggle');
-
     var amount = $("#parm1").val();
-
     $("#sending-amount").text(amount);
-
-     $("#sending-address").text(crowdFundingAddress);
-
-     $("#qrcode").text("");
-
-     var qrcode = new QRCode("qrcode");
-     qrcode.makeCode(crowdFundingAddress);
-
-    
-
+    $("#sending-address").text(crowdFundingAddress);
+    $("#qrcode").text("");
+    var qrcode = new QRCode("qrcode");
+    qrcode.makeCode(crowdFundingAddress);
     $("#noticeModal").modal();
 }
 
@@ -274,7 +207,6 @@ Number.prototype.formatMoney = function (c, d, t) {
 };
 
 function getCookie(cname) {
-
     var name = cname + "=", ca = document.cookie.split(';'), i, c;
 
     for (i = 0; i < ca.length; i += 1) {
@@ -316,7 +248,7 @@ function convertTimestamp(timestamp) {
         h = 12;
     }
 
-    // ie: 2013-02-18, 8:35 AM	
+    // ie: 2013-02-18, 8:35 AM
     time = yyyy + '-' + mm + '-' + dd + ', ' + h + ':' + min + ' ' + ampm;
     time = mm + '/' + dd + '/' + yyyy + '  ' + h + ':' + min + ':' + sec + ' ' + ampm;
 
@@ -349,149 +281,124 @@ $(document).on('submit', '#save-sending-address', function (e) {
         // handle the invalid form...
     } else {
         e.preventDefault();
-       showSendingAddress();
-
+        showSendingAddress();
     }
 });
 
 
-
 $(document).ready(function () {
-
-     setFormValidation('#save-sending-address');
-
-
-
-
-
-
-var inputBox = document.getElementById('contribution');
-
-inputBox.onkeyup = function(){
-    document.getElementById('contribution-print').innerHTML = "You will get "  + (Number(inputBox.value) / SWARM_PriceETH).formatMoney(5, '.', ',') + " SWARM";
-}
+    setFormValidation('#save-sending-address');
+    var inputBox = document.getElementById('contribution');
+    inputBox.onkeyup = function(){
+        document.getElementById('contribution-print').innerHTML = "You will get "  + (Number(inputBox.value) / SWARM_PriceETH).formatMoney(5, '.', ',') + " SWARM";
+    }
 
 
     var opt = {
 
-        numMinLabel: false,
-        horTitle: 'Sold',
-        horLabelPos: "topLeft",
+      numMinLabel: false,
+      horTitle: 'Sold',
+      horLabelPos: "topLeft",
 
-        animTime: 100,
-        milestones: {
-            1: {
-                mlPos: 0,
-                mlId: false,
-                mlClass: 'bi-middle-mlst',
-                mlDim: '200%',
-                mlLabel: '$0.10',
-                mlLabelVis: 'hover',
-                mlHoverRange: 15,
-                mlLineWidth: 3
-            },
-            2: {
-                mlPos: 12.0,
-                mlId: false,
-                mlClass: 'bi-middle-mlst',
-                mlDim: '200%',
-                mlLabel: '$0.40',
-                mlLabelVis: 'hover',
-                mlHoverRange: 15,
-                mlLineWidth: 3
-            },
-            3: {
-                mlPos: 24.0,
-                mlId: false,
-                mlClass: 'bi-middle-mlst',
-                mlDim: '200%',
-                mlLabel: '$0.70',
-                mlLabelVis: 'hover',
-                mlHoverRange: 15,
-                mlLineWidth: 3
-            }
-            ,
-            4: {
-                mlPos: 36.0,
-                mlId: false,
-                mlClass: 'bi-middle-mlst',
-                mlDim: '200%',
-                mlLabel: '$1.40',
-                mlLabelVis: 'hover',
-                mlHoverRange: 15,
-                mlLineWidth: 3
-            }
-            ,
-            5: {
-                mlPos: 48.0,
-                mlId: false,
-                mlClass: 'bi-middle-mlst',
-                mlDim: '200%',
-                mlLabel: '$1.75',
-                mlLabelVis: 'hover',
-                mlHoverRange: 15,
-                mlLineWidth: 3
-            }
-            ,
-            6: {
-                mlPos: 60.0,
-                mlId: false,
-                mlClass: 'bi-middle-mlst',
-                mlDim: '200%',
-                mlLabel: '$2.10',
-                mlLabelVis: 'hover',
-                mlHoverRange: 15,
-                mlLineWidth: 3
-            }
-            ,
-            7: {
-                mlPos: 72.0,
-                mlId: false,
-                mlClass: 'bi-middle-mlst',
-                mlDim: '200%',
-                mlLabel: '$2.45',
-                mlLabelVis: 'hover',
-                mlHoverRange: 15,
-                mlLineWidth: 3
-            }
-            ,
-            8: {
-                mlPos: 84.0,
-                mlId: false,
-                mlClass: 'bi-middle-mlst',
-                mlDim: '200%',
-                mlLabel: '$2.80',
-                mlLabelVis: 'hover',
-                mlHoverRange: 15,
-                mlLineWidth: 3
-            }
-
-
+      animTime: 100,
+      milestones: {
+        1: {
+          mlPos: 0,
+          mlId: false,
+          mlClass: 'bi-middle-mlst',
+          mlDim: '200%',
+          mlLabel: '$0.10',
+          mlLabelVis: 'hover',
+          mlHoverRange: 15,
+          mlLineWidth: 3
+        },
+        2: {
+          mlPos: 12.0,
+          mlId: false,
+          mlClass: 'bi-middle-mlst',
+          mlDim: '200%',
+          mlLabel: '$0.40',
+          mlLabelVis: 'hover',
+          mlHoverRange: 15,
+          mlLineWidth: 3
+        },
+        3: {
+          mlPos: 24.0,
+          mlId: false,
+          mlClass: 'bi-middle-mlst',
+          mlDim: '200%',
+          mlLabel: '$0.70',
+          mlLabelVis: 'hover',
+          mlHoverRange: 15,
+          mlLineWidth: 3
         }
-
+        ,
+        4: {
+          mlPos: 36.0,
+          mlId: false,
+          mlClass: 'bi-middle-mlst',
+          mlDim: '200%',
+          mlLabel: '$1.40',
+          mlLabelVis: 'hover',
+          mlHoverRange: 15,
+          mlLineWidth: 3
+        }
+        ,
+        5: {
+          mlPos: 48.0,
+          mlId: false,
+          mlClass: 'bi-middle-mlst',
+          mlDim: '200%',
+          mlLabel: '$1.75',
+          mlLabelVis: 'hover',
+          mlHoverRange: 15,
+          mlLineWidth: 3
+        }
+        ,
+        6: {
+          mlPos: 60.0,
+          mlId: false,
+          mlClass: 'bi-middle-mlst',
+          mlDim: '200%',
+          mlLabel: '$2.10',
+          mlLabelVis: 'hover',
+          mlHoverRange: 15,
+          mlLineWidth: 3
+        }
+        ,
+        7: {
+          mlPos: 72.0,
+          mlId: false,
+          mlClass: 'bi-middle-mlst',
+          mlDim: '200%',
+          mlLabel: '$2.45',
+          mlLabelVis: 'hover',
+          mlHoverRange: 15,
+          mlLineWidth: 3
+        }
+        ,
+        8: {
+          mlPos: 84.0,
+          mlId: false,
+          mlClass: 'bi-middle-mlst',
+          mlDim: '200%',
+          mlLabel: '$2.80',
+          mlLabelVis: 'hover',
+          mlHoverRange: 15,
+          mlLineWidth: 3
+        }
+      }
     };
-
-
-
-
-
 
     $('#bar').barIndicator(opt);
 
-
-    //handle invest window
-$("#invest").click(function () {
-
-
-  //  actionButton = document.getElementById("modal-action-areyousure");
-  //  actionButton.addEventListener('click', showSendingAddress);    
-    var contribution = $("#contribution").val();
-    $("#parm1").val(contribution);
-     $("#sending-address").text("");
-    $("#areYouSure").modal();
-
-});
-
-
-
+    // handle invest window
+    $("#invest").click(function () {
+        // actionButton = document.getElementById("modal-action-areyousure");
+        // actionButton.addEventListener('click', showSendingAddress);
+        var contribution = $("#contribution").val();
+        $("#parm1").val(contribution);
+         $("#sending-address").text("");
+        $("#areYouSure").modal();
+    });
 })
