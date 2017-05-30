@@ -1,6 +1,6 @@
 "use strict";
 
-var crowdFundingContrat;
+var crowdFundingContract;
 var crowdFundingHandle;
 var swarmTokenContract
 var swarmTokenHandle;
@@ -59,7 +59,7 @@ function init() {
     gasAmount = 4000000;
 
     crowdFundingContract = web3.eth.contract(crowdFundingABI);
-    crowdFundingHandle = crowdFundingContrat.at(crowdFundingAddress);
+    crowdFundingHandle = crowdFundingContract.at(crowdFundingAddress);
 
     swarmTokenContract = web3.eth.contract(tokenContractABI);
     swarmTokenHandle = swarmTokenContract.at(tokenContractAddress);
@@ -188,19 +188,24 @@ function updateEthToBtcRate(rate){
     crowdFundingHandle.setEthToBtcRate(rate)
 };
 
-var CronJob = require('cron').CronJob;
+
+
+//var CronJob = require('cron').CronJob;
 // Update the weiToSatoshi rate every 10 minutes
-var job = new CronJob('*/10 * * * *', function() {
-      console.log("Starting weiToSatoshi update cron... (every 10 mins)")
-      const amount = retrieveEthToBtcRate(url);
-      const wei = ethToWei(amount);
-      updateEthToBtcRate(wei);
-    }, function () {
+
+ 
+ //var job = new CronJob('*/10 * * * *', function() {
+ //     console.log("Starting weiToSatoshi update cron... (every 10 mins)")
+ //     const amount = retrieveEthToBtcRate(url);
+ //     const wei = ethToWei(amount);
+//      updateEthToBtcRate(wei);
+//    }, function () {
         //TODO: Code for after the job runs
-    },
-    true, // Start the job right now
-    timeZone // Time zone of this job
-);
+//    },
+//    true, // Start the job right now
+//    timeZone // Time zone of this job
+//);
+
 
 
 function calculateSWARMPrice(totalTokensSold) {
@@ -334,6 +339,9 @@ $(document).ready(function () {
     inputBox.onkeyup = function(){
         document.getElementById('contribution-print').innerHTML = "You will get "  + (Number(inputBox.value) / SWARM_PriceETH).formatMoney(5, '.', ',') + " SWARM";
     }
+
+
+    var selectedCoin = document.getElementById('contribution-coin');
 
 
     var opt = {

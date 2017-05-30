@@ -13,7 +13,7 @@
       <!--  Material Dashboard CSS    -->
       <link href="../assets/css/material-dashboard.css" rel="stylesheet" />
       <link href="../assets/css/bi-style.css" rel="stylesheet" />
-      <link rel="stylesheet" href="../dist/css/timeframe.css">
+      <link rel="stylesheet" href="../assets/css/timeframe.css">
       <!--     Fonts and icons     -->
       <link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
       <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons"
@@ -201,7 +201,7 @@
                                                 <tbody>
                                                    <tr style="font-size: 60%;">
                                                       <td width="8%" class="text-left">
-                                                         <b>0 BTC</b> 
+                                                         <b>0 BTC</b>
                                                       </td>
                                                       <td width="12%" class="text-left">
                                                          <b>167 BTC</b>
@@ -276,7 +276,7 @@
                                     <span class="dropdown">
                                        <button href="#" class="dropdown-toggle btn btn-lg btn-rose btn-round" data-toggle="dropdown">ETH <b class="caret"></b></button>
                                        <ul class="dropdown-menu dropdown-primary dropdown-menu-right">
-                                          <li class="dropdown-header">Choose your source</li>
+                                          <li class="dropdown-header">Choose coin</li>
                                           <li><a href="#">ETH</a></li>
                                           <li><a href="#">BTC</a></li>
                                        </ul>
@@ -284,7 +284,7 @@
                                  </div>
                                  <div class="col-md-2">
                                     <div class="form-group label-floating">
-                                       <label class="control-label">Amount in ETH</label>
+                                       <label class="control-label" id="contribution-coin">Amount in ETH</label>
                                        <input style="font-size:20px" type="text" class="form-control" id="contribution">
                                     </div>
                                  </div>
@@ -344,13 +344,11 @@
                      SWARM
                      <ledger></ledger>
                   </a>
-                  , made with love for a better
-                  web
+                  , made with love for a better web
                </p>
             </div>
          </footer>
       </div>
-      
       <!-- Modal  login window start -->
       <div class="modal fade" id="modal-login" role="dialog">
          <div class="modal-dialog">
@@ -411,7 +409,6 @@
          <!-- end of modal-dialog -->
       </div>
       <!-- Modal  login window end -->
-
       <!-- Modal register  window start -->
       <div class="modal fade" id="modal-register" role="dialog">
          <div class="modal-dialog">
@@ -475,13 +472,12 @@
                         </div>
                      </div>
                   </form>
-                  </div>
                </div>
-               <!-- end of card content -->
             </div>
-            <!-- end of card -->
+            <!-- end of card content -->
          </div>
-      
+         <!-- end of card -->
+      </div>
       <!-- Modal register  window end -->
       <!-- Modal progress box start -->
       <div class="modal fade" id="progress" role="dialog">
@@ -527,7 +523,9 @@
                         </div>
                      </div>
                   </div>
-                  <p>If you have more questions, don't hesitate to contact us or send <a href="mailto:support@swarm.fund">us email</a>support@swarm.fund. We're here to help!</p>
+                  <p>If you have more questions, don't hesitate to contact us or send <a href="mailto:support@swarm.fund">us email</a>support@swarm.fund.
+                     We're here to help!
+                  </p>
                </div>
                <div class="modal-footer text-center">
                   <button type="button" class="btn btn-info btn-round" data-dismiss="modal">I'm done!</button>
@@ -536,7 +534,6 @@
          </div>
       </div>
       <!-- end notice modal -->
-
       <!-- Modal are you sure window start -->
       <div class="modal fade" id="areYouSure" role="dialog">
          <div class="modal-dialog">
@@ -583,8 +580,6 @@
             </div>
          </div>
       </div>
-
-      
       <!-- javascript for validation -->
    </body>
    <!--   Core JS Files   -->
@@ -592,35 +587,21 @@
    <script src="../assets/js/jquery-ui.min.js" type="text/javascript"></script>
    <script src="../assets/js/bootstrap.min.js" type="text/javascript"></script>
    <script src="../assets/js/material.min.js" type="text/javascript"></script>
-   <script src="../assets/js/perfect-scrollbar.jquery.min.js" type="text/javascript"></script>
+  
    <!-- Forms Validations Plugin -->
    <script src="../assets/js/jquery.validate.min.js"></script>
-   <!--  Plugin for Date Time Picker and Full Calendar Plugin-->
-   <script src="../assets/js/moment.min.js"></script>
-   <!--  Charts Plugin -->
-   <script src="../assets/js/chartist.min.js"></script>
-   <!--  Plugin for the Wizard -->
-   <script src="../assets/js/jquery.bootstrap-wizard.js"></script>
    <!--  Notifications Plugin    -->
    <script src="../assets/js/bootstrap-notify.js"></script>
-   <!-- DateTimePicker Plugin -->
-   <script src="../assets/js/bootstrap-datetimepicker.js"></script>
-   <!-- Vector Map plugin -->
-   <script src="../assets/js/jquery-jvectormap.js"></script>
-   <!-- Sliders Plugin -->
-   <script src="../assets/js/nouislider.min.js"></script>
-   <!--  Google Maps Plugin    -->
-   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDPGHQ3v8h9cYsXw03nFSfNxkHZnhABjZw"></script>
+  
+   
+   
+   
    <!-- Select Plugin -->
    <script src="../assets/js/jquery.select-bootstrap.js"></script>
-   <!--  DataTables.net Plugin    -->
-   <script src="../assets/js/jquery.datatables.js"></script>
-   <!-- Sweet Alert 2 plugin -->
-   <script src="../assets/js/sweetalert2.js"></script>
-   <!--	Plugin for Fileupload, full documentation here: http://www.jasny.net/bootstrap/javascript/#fileinput -->
-   <script src="../assets/js/jasny-bootstrap.min.js"></script>
-   <!--  Full Calendar Plugin    -->
-   <script src="../assets/js/fullcalendar.min.js"></script>
+   
+  
+  
+  
    <!-- TagsInput Plugin -->
    <script src="../assets/js/jquery.tagsinput.js"></script>
    <!-- Material Dashboard javascript methods -->
@@ -634,14 +615,9 @@
    <!-- web3 libraries -->
    <script src="../../web3/dist/web3.js"></script>
    <!--generate ethereum address -->
-   <script src="../dist/js/lightwallet.min.js"></script>
-   <script type="text/javascript" src="../../web3/hooked-web3-provider/build/hooked-web3-provider.js"></script>
-   <!-- library of functioin to render time passed since action was made -->
-   <script src="../assets/js/jquery.timeago.js" type="text/javascript"></script>
-   <!-- Modernizr used with timeframe-->
-   <script src="../dist/js/modernizr.js"></script>
+  
    <!-- timeline library -->
-   <script src="../dist/js/timeframe-main.js"></script>
+   <script src="../assets/js/timeframe-main.js"></script>
    <!-- qrcode library -->
    <script src="../assets/js/qrcode.js"></script>
    <script type="text/javascript">
