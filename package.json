@@ -1,0 +1,24 @@
+{
+  "name": "breathe",
+  "version": "1.0.0",
+  "description": "Changelog:",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fractastical/breathe.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fractastical/breathe/issues"
+  },
+  "homepage": "https://github.com/fractastical/breathe#readme",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.3",
+    "web3": "^0.19.0"
+  }
+}
