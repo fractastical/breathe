@@ -14,7 +14,9 @@ var adminAccount = '0x6C88e6C76C1Eb3b130612D5686BE9c0A0C78925B';
 var supportEmail = "support@swarm.fund";
 var organizationName = "Swarm";
 //var nodejsUrl = "http://184.68.74.253:8081/process_get";
-var nodejsUrl = "http://localhost:8081/process_get";
+var nodejsUrl = "http://localhost:8085/process_get";
+
+var mongoDBURL = "http://localhost:8085/";
 var tokenContractAddress = "0x261f54f3c6916581eDd881A37A80C2EE4C29876b";
 //var memberAddress = "0xdbe5a78DDAE6be8B8097c6801B021d0B44d6863E";
   

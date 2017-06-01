@@ -15,7 +15,18 @@ var SWARM_PriceETH;
 var SWARM_PriceUSD;
 var actionButton;
 
-
+/**
+ * This function is called every time html page is opened.
+ * it initiates organization name on the html page and creates
+ * web3 objects and establishes connection to the node.
+ * it creates handle to the contract based on the contract interface
+ * and contract address, which is located in interface.js
+ * it verifies balance of the user and executes appropriate load function
+ * based on which html page it calls.
+ *
+ * @method init
+ *
+ */
 function init() {
     var proposal,
         mode,
@@ -74,11 +85,21 @@ function init() {
 }
 
 
+/**
+ * This function is called each time to determine which html to
+ * render based on the url
+ */
+
 function renderPage() {
-    if (window.location.href.indexOf("index.html") > 0) renderDashBoard();
+    if (window.location.href.indexOf("index.html") > 0 || window.location.href.indexOf("") > 0) renderDashBoard();
 }
 
 
+/**
+ * This function is called to render dashboard.
+ * Proper html is retrieved and smart contract accessed
+ * to populate status of the crowdfunding campaign.
+ */
 function renderDashBoard() {
     // calculate number of tokens owned by logged user
     var tokenBalance = swarmTokenHandle.balanceOf(currAccount) / Math.pow(10, 10);
@@ -184,16 +205,114 @@ function calculateSWARMPrice(totalTokensSold) {
 }
 
 
-function showSendingAddress(){
+
+/**
+ * Verifies if Etherum address provided to withdraw Ehter is valid
+ *
+ * @method isAddress
+ * @param {String} Ethereum address
+ * @return {Boolean} True if address is valid, false if invalid
+ *
+ */
+
+var isAddress = function (address) {
+    if (!/^(0x)?[0-9a-f]{40}$/i.test(address)) {
+        // check if it has the basic requirements of an address
+        return false;
+    } else if (/^(0x)?[0-9a-f]{40}$/.test(address) || /^(0x)?[0-9A-F]{40}$/.test(address)) {
+        // If it's all small caps or all all caps, return true
+        return true;
+    } else {
+        // Otherwise check each case
+        return isChecksumAddress(address);
+    }
+};
+
+/**
+ * Checks if the given string is a checksummed address
+ *
+ * @method isChecksumAddress
+ * @param {String} address the given HEX adress
+ * @return {Boolean}
+ */
+var isChecksumAddress = function (address) {
+    // Check each case
+    address = address.replace('0x', '');
+    var addressHash = web3.sha3(address.toLowerCase());
+    for (var i = 0; i < 40; i++) {
+        // the nth letter should be uppercase if the nth digit of casemap is 1
+        if ((parseInt(addressHash[i], 16) > 7 && address[i].toUpperCase() !== address[i]) || (parseInt(addressHash[i], 16) <= 7 && address[i].toLowerCase() !== address[i])) {
+            return false;
+        }
+    }
+    return true;
+};
+
+
+/**
+ * This function is called to display to user Ethereum addres
+ * to which campaign contribution should be made.
+ *
+ */
+function showSendingAddress() {
+
+    var address = $("#blockchain-address").val();
+
+    if (!isAddress(address.substr(2).toLowerCase())) {
+        showTimeNotification("top", "right", "This is not Ethereum address. Please enter correct Ethereum address.")
+        return;
+    }
     $("#areYouSure").modal('toggle');
     var amount = $("#parm1").val();
-    $("#sending-amount").text(amount);
+
+
+    if ($('#change-currency option:selected').text() == "ETH")
+        $("#sending-amount").text(amount + " ETH");
+    else
+        $("#sending-amount").text(amount + " BTC");
+
     $("#sending-address").text(crowdFundingAddress);
     $("#qrcode").text("");
     var qrcode = new QRCode("qrcode");
     qrcode.makeCode(crowdFundingAddress);
     $("#noticeModal").modal();
 }
+
+/**
+ * It displays pop-up notifications.
+ * It randomly shifts through array of colors to display
+ * popup messages in different colors.
+ *
+ * @method showTimeNotification
+ *
+ */
+
+function showTimeNotification(from, align, text) {
+
+    var type = ['', 'info', 'success', 'warning', 'danger', 'rose', 'primary'];
+
+    var color = Math.floor((Math.random() * 6) + 1);
+
+    $.notify({
+        icon: "notifications",
+        message: text
+
+    }, {
+        type: type[color],
+        timer: 30000,
+        z_index: 10031,
+        placement: {
+            from: from,
+            align: align
+        }
+    });
+}
+
+
+/**
+ * format money according to passed pattern.
+ *
+ */
 
 Number.prototype.formatMoney = function (c, d, t) {
     var n = this,
@@ -206,8 +325,16 @@ Number.prototype.formatMoney = function (c, d, t) {
     return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
 };
 
+
+/**
+ * Retrive cookies based on the cookie name.
+ * @param {string} cname
+ * @return {string}
+ */
 function getCookie(cname) {
-    var name = cname + "=", ca = document.cookie.split(';'), i, c;
+    var name = cname + "=",
+        ca = document.cookie.split(';'),
+        i, c;
 
     for (i = 0; i < ca.length; i += 1) {
         c = ca[i];
@@ -221,16 +348,20 @@ function getCookie(cname) {
     return "";
 }
 
-
+/**
+ * Convert Unix timestamp to time
+ * @param {integer} timestamp
+ * @return {string}
+ */
 
 function convertTimestamp(timestamp) {
-    var d = new Date(timestamp * 1000),	// Convert the passed timestamp to milliseconds
+    var d = new Date(timestamp * 1000), // Convert the passed timestamp to milliseconds
         yyyy = d.getFullYear(),
-        mm = ('0' + (d.getMonth() + 1)).slice(-2),	// Months are zero based. Add leading 0.
-        dd = ('0' + d.getDate()).slice(-2),			// Add leading 0.
+        mm = ('0' + (d.getMonth() + 1)).slice(-2), // Months are zero based. Add leading 0.
+        dd = ('0' + d.getDate()).slice(-2), // Add leading 0.
         hh = d.getHours(),
         h = hh,
-        min = ('0' + d.getMinutes()).slice(-2),		// Add leading 0.
+        min = ('0' + d.getMinutes()).slice(-2), // Add leading 0.
         sec = d.getSeconds(),
         ampm = 'AM',
         time;
@@ -255,17 +386,29 @@ function convertTimestamp(timestamp) {
     return time;
 }
 
-function formatNumber(number) {
-    number = number.toFixed(0) + '';
-    var x = number.split('.');
-    var x1 = x[0];
-    var x2 = x.length > 1 ? '.' + x[1] : '';
-    var rgx = /(\d+)(\d{3})/;
-    while (rgx.test(x1)) {
-        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+/**
+ * It calculate number of tokens to be issued based on entered value
+ * and curency selected.
+ * @param {object} inputBox
+ */
+
+function calculateTokenes(inputBox) {
+
+    if ($('#change-currency option:selected').text() == "ETH") {
+        $("#contribution-coin").html("Enter amount in ETH");
+        $('#contribution-print').html("You will get " + (Number(inputBox.value) / SWARM_PriceETH).formatMoney(5, '.', ',') + " SWARM");
+    } else {
+        $("#contribution-coin").html("Enter amount in BTC");
+        $('#contribution-print').html("You will get " + (Number(inputBox.value) / SWARM_PriceBTC).formatMoney(5, '.', ',') + " SWARM");
     }
-    return x1 + x2;
+
 }
+
+
+
+
+
+
 
 function setFormValidation(id) {
     $(id).validate({
@@ -285,123 +428,170 @@ $(document).on('submit', '#save-sending-address', function (e) {
     }
 });
 
+/**
+ * submit new user registration to mongodb.
+ *
+ */
+
+
+$(document).on('submit', '#register-form-initial', function (e) {
+    e.preventDefault();
+    $.post(mongoDBURL + "add_new_member",
+
+
+        {
+            blockchainAddress: $("input[name=addr]").val(),
+            firstName: $("input[name=firstName]").val(),
+            lastName: $("input[name=lastName]").val(),
+            emailAddress: $("input[name=emailAddress]").val(),
+            mobilePhone: $("input[name=mobilePhone]").val(),
+        },
+        function (data, status) {
+
+            if (data == "success" && status == "success") {
+                showTimeNotification("top", "right", "Congratulations, your account has been created.")
+            } else {
+                showTimeNotification("top", "right", "Something went wrong.")
+            }
+        });
+});
 
 $(document).ready(function () {
+
     setFormValidation('#save-sending-address');
-    var inputBox = document.getElementById('contribution');
-    inputBox.onkeyup = function(){
-        document.getElementById('contribution-print').innerHTML = "You will get "  + (Number(inputBox.value) / SWARM_PriceETH).formatMoney(5, '.', ',') + " SWARM";
+    setFormValidation('#register-form-initial');
+
+
+    // process only if dashboard page called.
+    if (window.location.href.indexOf("index.html") > 0) {
+
+        var inputBox = document.getElementById('contribution');
+        inputBox.onkeyup = function () {
+            document.getElementById('contribution-print').innerHTML = "You will get " + (Number(inputBox.value) / SWARM_PriceETH).formatMoney(5, '.', ',') + " SWARM";
+            calculateTokenes(inputBox);
+        }
+
+
+        var selectPicker = document.getElementById('change-currency');
+        selectPicker.onchange = function () {
+            calculateTokenes(inputBox);
+        }
+
+        var opt = {
+
+            numMinLabel: false,
+            horTitle: 'Sold',
+            horLabelPos: "topLeft",
+
+            animTime: 100,
+            milestones: {
+                1: {
+                    mlPos: 0,
+                    mlId: false,
+                    mlClass: 'bi-middle-mlst',
+                    mlDim: '200%',
+                    mlLabel: '$0.10',
+                    mlLabelVis: 'hover',
+                    mlHoverRange: 15,
+                    mlLineWidth: 3
+                },
+                2: {
+                    mlPos: 12.0,
+                    mlId: false,
+                    mlClass: 'bi-middle-mlst',
+                    mlDim: '200%',
+                    mlLabel: '$0.40',
+                    mlLabelVis: 'hover',
+                    mlHoverRange: 15,
+                    mlLineWidth: 3
+                },
+                3: {
+                    mlPos: 24.0,
+                    mlId: false,
+                    mlClass: 'bi-middle-mlst',
+                    mlDim: '200%',
+                    mlLabel: '$0.70',
+                    mlLabelVis: 'hover',
+                    mlHoverRange: 15,
+                    mlLineWidth: 3
+                },
+                4: {
+                    mlPos: 36.0,
+                    mlId: false,
+                    mlClass: 'bi-middle-mlst',
+                    mlDim: '200%',
+                    mlLabel: '$1.40',
+                    mlLabelVis: 'hover',
+                    mlHoverRange: 15,
+                    mlLineWidth: 3
+                },
+                5: {
+                    mlPos: 48.0,
+                    mlId: false,
+                    mlClass: 'bi-middle-mlst',
+                    mlDim: '200%',
+                    mlLabel: '$1.75',
+                    mlLabelVis: 'hover',
+                    mlHoverRange: 15,
+                    mlLineWidth: 3
+                },
+                6: {
+                    mlPos: 60.0,
+                    mlId: false,
+                    mlClass: 'bi-middle-mlst',
+                    mlDim: '200%',
+                    mlLabel: '$2.10',
+                    mlLabelVis: 'hover',
+                    mlHoverRange: 15,
+                    mlLineWidth: 3
+                },
+                7: {
+                    mlPos: 72.0,
+                    mlId: false,
+                    mlClass: 'bi-middle-mlst',
+                    mlDim: '200%',
+                    mlLabel: '$2.45',
+                    mlLabelVis: 'hover',
+                    mlHoverRange: 15,
+                    mlLineWidth: 3
+                },
+                8: {
+                    mlPos: 84.0,
+                    mlId: false,
+                    mlClass: 'bi-middle-mlst',
+                    mlDim: '200%',
+                    mlLabel: '$2.80',
+                    mlLabelVis: 'hover',
+                    mlHoverRange: 15,
+                    mlLineWidth: 3
+                }
+            }
+        };
+
+        $('#bar').barIndicator(opt);
     }
 
 
-    var selectedCoin = document.getElementById('contribution-coin');
-
-
-    var opt = {
-
-      numMinLabel: false,
-      horTitle: 'Sold',
-      horLabelPos: "topLeft",
-
-      animTime: 100,
-      milestones: {
-        1: {
-          mlPos: 0,
-          mlId: false,
-          mlClass: 'bi-middle-mlst',
-          mlDim: '200%',
-          mlLabel: '$0.10',
-          mlLabelVis: 'hover',
-          mlHoverRange: 15,
-          mlLineWidth: 3
-        },
-        2: {
-          mlPos: 12.0,
-          mlId: false,
-          mlClass: 'bi-middle-mlst',
-          mlDim: '200%',
-          mlLabel: '$0.40',
-          mlLabelVis: 'hover',
-          mlHoverRange: 15,
-          mlLineWidth: 3
-        },
-        3: {
-          mlPos: 24.0,
-          mlId: false,
-          mlClass: 'bi-middle-mlst',
-          mlDim: '200%',
-          mlLabel: '$0.70',
-          mlLabelVis: 'hover',
-          mlHoverRange: 15,
-          mlLineWidth: 3
-        }
-        ,
-        4: {
-          mlPos: 36.0,
-          mlId: false,
-          mlClass: 'bi-middle-mlst',
-          mlDim: '200%',
-          mlLabel: '$1.40',
-          mlLabelVis: 'hover',
-          mlHoverRange: 15,
-          mlLineWidth: 3
-        }
-        ,
-        5: {
-          mlPos: 48.0,
-          mlId: false,
-          mlClass: 'bi-middle-mlst',
-          mlDim: '200%',
-          mlLabel: '$1.75',
-          mlLabelVis: 'hover',
-          mlHoverRange: 15,
-          mlLineWidth: 3
-        }
-        ,
-        6: {
-          mlPos: 60.0,
-          mlId: false,
-          mlClass: 'bi-middle-mlst',
-          mlDim: '200%',
-          mlLabel: '$2.10',
-          mlLabelVis: 'hover',
-          mlHoverRange: 15,
-          mlLineWidth: 3
-        }
-        ,
-        7: {
-          mlPos: 72.0,
-          mlId: false,
-          mlClass: 'bi-middle-mlst',
-          mlDim: '200%',
-          mlLabel: '$2.45',
-          mlLabelVis: 'hover',
-          mlHoverRange: 15,
-          mlLineWidth: 3
-        }
-        ,
-        8: {
-          mlPos: 84.0,
-          mlId: false,
-          mlClass: 'bi-middle-mlst',
-          mlDim: '200%',
-          mlLabel: '$2.80',
-          mlLabelVis: 'hover',
-          mlHoverRange: 15,
-          mlLineWidth: 3
-        }
-      }
-    };
-
-    $('#bar').barIndicator(opt);
-
-    // handle invest window
+    /**
+     *  Open Investing wiondw.
+     *
+     */
     $("#invest").click(function () {
         // actionButton = document.getElementById("modal-action-areyousure");
         // actionButton.addEventListener('click', showSendingAddress);
         var contribution = $("#contribution").val();
+        if (contribution == 0) {
+            showTimeNotification("top", "right", "Plese specify amount first.")
+            return;
+        }
+
+        if (!$.isNumeric(contribution)) {
+            showTimeNotification("top", "right", "Amount you have entered is not a number.")
+            return;
+        }
+
         $("#parm1").val(contribution);
-         $("#sending-address").text("");
+        $("#blockchain-address").val("");
         $("#areYouSure").modal();
     });
 })
