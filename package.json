@@ -19,6 +19,8 @@
   "dependencies": {
     "body-parser": "^1.17.2",
     "express": "^4.15.3",
+    "node-fetch": "^1.7.0",
+    "node-schedule": "^1.2.3",
     "web3": "^0.19.0"
   }
 }
