@@ -52,6 +52,100 @@ app.use(function (req, res, next) {
 });
 
 
+app.post('/process_get_one', function (req, res) {
+
+    // Use connect method to connect to the Server
+    MongoClient.connect(url, function (err, db) {
+        assert.equal(null, err);
+        console.log("Connected correctly to server");
+
+        
+        // Get the documents collection
+        var collection = db.collection('Membership');
+        // Find some documents
+        console.log("Requested following email address   ");
+        console.log(req.body.email);
+
+       
+
+       // var id = require('mongodb').ObjectID(req.body.email);
+
+       
+
+
+        //var o_id = new ObjectId(req.body.id);
+        collection.find({email: req.body.email }).toArray(function (err, docs) {    
+            assert.equal(err, null);
+            console.log("Found the following records");
+            console.log(docs)
+            
+            res.end(JSON.stringify(docs)); 
+        });
+        console.log("Retrieved documents");
+        db.close();
+       
+    });
+
+
+
+})
+
+
+app.post('/process_update_one', function (req, res) {
+
+    // Use connect method to connect to the Server
+    MongoClient.connect(url, function (err, db) {
+        assert.equal(null, err);
+        console.log("Connected correctly to server");
+
+        // Get the documents collection
+        var collection = db.collection('Membership');
+        // Find some documents
+        console.log("Requested update of following element");
+        console.log(req.body.key);
+
+       // var id = require('mongodb').ObjectID(req.body.id);
+
+        var key = req.body.key;
+        var keyValue = req.body.keyValue;
+        var editorID = req.body.editor;
+        var date = new Date();
+
+        var email = req.body.email;
+        var address = req.body.address;
+
+        console.log("email:" + email);
+        console.log("address:" + address);
+        
+
+        var query = {};
+        query[key] = { data: keyValue, timeStamp: date, editor: editorID };
+        console.log("query:" + query);
+        collection.update({ email: email },
+            {
+                $set: { blockchainAddress: address  }
+                ,
+                
+
+                               
+            },
+
+            function (err, result) {
+                assert.equal(err, null);
+                
+                assert.equal(1, result.result.n);
+
+                res.end(JSON.stringify(result));
+            });
+
+        console.log("Update one filed in document.");
+        db.close();
+
+    });
+
+
+
+})
 
 
 
@@ -72,16 +166,18 @@ app.post('/add_new_member', function (req, res) {
 
         var date = new Date();
 
+
+       // accounts.insert(newData, {safe: true}, callback);
         // Insert a single document
         db.collection('Membership').insertOne({ 
-                             blockchainAddress: [{data: req.body.blockchainAddress, timeStamp: date}],
-							 firstName: [{data: req.body.firstName, timeStamp: date}],
-							 lastName: [{data: req.body.lastName, timeStamp: date}] ,
-                             email: [{data: req.body.emailAddress, timeStamp: date}] ,
-                             phone: [{data: req.body.mobilePhone, timeStamp: date}] ,  
-                             password: [{data: req.body.password, timeStamp: date}] ,  
-                             sponsor:[{data: req.body.sponsor, timeStamp: date}] ,                            
-                             comments:    [{data: "Application submitted by applicant", timeStamp: date}],                         
+                             blockchainAddress:req.body.blockchainAddress,
+							 firstName: req.body.firstName,
+							 lastName:  req.body.lastName ,
+                             email: req.body.emailAddress ,
+                             phone: req.body.mobilePhone ,  
+                             password: req.body.password,  
+                             sponsor: req.body.sponsor ,   
+                             sponsorType: req.body.sponsorType ,                        
                             }, function (err, r) {
             assert.equal(null, err);
             assert.equal(1, r.insertedCount);

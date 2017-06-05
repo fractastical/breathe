@@ -6,7 +6,7 @@ var tokenContractABI =[ { "constant": true, "inputs": [], "name": "name", "outpu
 
 
 //var connectionString = "http://184.68.74.253:8545";
-var connectionString = "http://localhost:8545";
+var connectionString = "http://localhost:8544";
 
 //var contractAddress = '0xF50B3bd709Ba152b31d499d9c34C380B26E305a9';
 //var contractAddressTestnet = contractAddress;
@@ -17,11 +17,11 @@ var organizationName = "Swarm";
 var nodejsUrl = "http://localhost:8085/process_get";
 
 var mongoDBURL = "http://localhost:8085/";
-var tokenContractAddress = "0x261f54f3c6916581eDd881A37A80C2EE4C29876b";
+var tokenContractAddress = "0x01505d942778A8c3DA2CCB72FeE0BC9790d3dF23";
 //var memberAddress = "0xdbe5a78DDAE6be8B8097c6801B021d0B44d6863E";
   
-var crowdFundingAddress  = "0x55f0AB8A7B935085Fcc62ea17Fe1904ab4bF7819";
-var crowdFundingBTC_Addres = "18D9WCQyDSrsuuhNi7RwaqFWJGgAeMjm9Y";
+var crowdFundingAddress  = "0xcaa452Dc73d46e81bD3dFd821dd787E229ccF137";
+var crowdFundingBTC_Addres = "dont' send money to it - 18D9WCQyDSrsuuhNi7RwaqFWJGgAeMjm9Y";
 
 
 

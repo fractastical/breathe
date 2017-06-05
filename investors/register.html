@@ -108,14 +108,14 @@
                                                 <span class="input-group-addon">
 												<i class="material-icons">lock_outline</i>
 											</span>
-                                                <input type="password" placeholder="Password..." class="form-control" id="inputPassword" required="true">
+                                                <input type="password" placeholder="Password..." class="form-control" id="input-password" required="true">
                                             </div>
                                             <div class="input-group">
                                                 <span class="input-group-addon">
 												<i class="material-icons">lock_outline</i>
 											</span>
                                                 <input class="form-control" name="password_confirmation" id="registerPasswordConfirmation" type="password" required="true"
-                                                    equalTo="#inputPassword" placeholder="Confirm Password..." data-match-error="Whoops, these don 't match"
+                                                    equalTo="#input-password" placeholder="Confirm Password..." data-match-error="Whoops, these don 't match"
                                                 />
                                             </div>
                                             <div class="footer text-center">
@@ -193,9 +193,10 @@
     <script>
         var x = document.referrer;
 
-        if (x == "" || x.includes(domain)) {
+      // if (x == "" || x.includes(domain)) {
             //alert("Illegal access");
-        } else {
+      //  } else {
+
 
             var params = {};
 
@@ -211,6 +212,6 @@
                 document.cookie = "ref=" + params.ref;
                 document.cookie = "reftype=1";
             }
-        }
+      //  }
     </script>
 </html>

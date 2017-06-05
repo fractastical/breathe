@@ -79,7 +79,7 @@ function init() {
     gasPrice = 20000000000;
     gasAmount = 4000000;
 
-    currAccount = adminAccount;
+    currAccount = getCookie("account");
 
     renderPage();
 }
@@ -275,7 +275,48 @@ function showSendingAddress() {
     $("#qrcode").text("");
     var qrcode = new QRCode("qrcode");
     qrcode.makeCode(crowdFundingAddress);
-    $("#noticeModal").modal();
+
+
+/*
+     $.post(mongoDBURL + "process_get_one",
+            {
+                email: "john.doe@gmail.com",
+
+            },
+            function (data, status) {
+
+                if (data != "" && status == "success") 
+                    showTimeNotification("top", "right", "Congratulations, your account has been created.");
+                else
+                showTimeNotification("top", "right", "Something went wrong.")
+            })
+                
+      */              
+
+   
+
+      $.post(mongoDBURL + "process_update_one",
+
+        {   address: address,   
+            email : getCookie("emailAddress"),                 
+        },
+        function (data, status) {
+
+            if (data != "" && status == "success") {
+                document.cookie = "account=" + address;                    
+              //  showTimeNotification("top", "right", "Congratulations, your account has been created.")
+                $("#noticeModal").modal();
+
+            } else {
+                showTimeNotification("top", "right", "Something went wrong.")
+            }
+        });
+
+        
+        
+        
+      $("#noticeModal").modal();
+
 }
 
 /**
@@ -439,17 +480,24 @@ $(document).on('submit', '#register-form-initial', function (e) {
     $.post(mongoDBURL + "add_new_member",
 
 
-        {
-            blockchainAddress: $("input[name=addr]").val(),
-            firstName: $("input[name=firstName]").val(),
-            lastName: $("input[name=lastName]").val(),
-            emailAddress: $("input[name=emailAddress]").val(),
-            mobilePhone: $("input[name=mobilePhone]").val(),
+        {   sponsor: getCookie("ref"),
+            sponsorType: getCookie("reftype"),
+            blockchainAddress: $("input[id=addr]").val(),
+            firstName: $("input[id=first-name]").val(),
+            lastName: $("input[id=last-name]").val(),
+            emailAddress: $("input[id=email-address]").val(),   
+            password: $("input[id=input-password]").val(),        
         },
         function (data, status) {
 
             if (data == "success" && status == "success") {
                 showTimeNotification("top", "right", "Congratulations, your account has been created.")
+
+                document.cookie = "firstName=" + $("input[id=first-name]").val();
+                document.cookie = "lastName=" + $("input[id=last-name]").val();
+                document.cookie = "emailAddress=" + $("input[id=email-address]").val();               
+                location.replace('index.html');
+
             } else {
                 showTimeNotification("top", "right", "Something went wrong.")
             }
