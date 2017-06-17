@@ -79,6 +79,7 @@ import "./Pausable.sol";
       }
 
 
+      // specify address of token contract
       function updateTokenAddress(SWARM _SWARMAddress) public onlyBy(owner) returns(bool) {
 
           swarm = _SWARMAddress;
@@ -90,6 +91,9 @@ import "./Pausable.sol";
       /// {fallback function}  
       /// @notice It will call internal function which handels allocation of Ether and calculates SWARM tokens.   
       function () payable {
+
+          //use this for live
+          //if (block.number > endBlock ) throw;
           if (now > endBlock) throw;
           handleETH(msg.sender);
       }
@@ -138,7 +142,7 @@ import "./Pausable.sol";
       /// @notice It is called by CalculateNoOfTokens to determine the price in case purchase spans more than
       /// one pricing range. 
       /// @param _range {uint} current range computed
-      /// @return 
+      /// @return _amount, _totalTokensSold, _tokensToPurchase
       function calaculateSpan(uint _range, uint _price, uint _totalTokensSold, uint _amount, uint _tokensToPurchase) internal constant returns(uint, uint, uint) {
 
           uint tokensLeft = _range - _totalTokensSold;
@@ -211,8 +215,7 @@ import "./Pausable.sol";
       /// it will only execute if predetermined sale time passed.     
       function finalize() onlyBy(owner) {
 
-          if (now < endBlock) throw; // Can only be finilized if 30 days passed
-          // investors have 15 days to get their funds back before this can be executed
+          if (now < endBlock) throw; // Can only be finilized if 30 days passed         
           if (!multisigETH.send(this.balance)) throw; // moves the remaining ETH to the multisig address
 
           uint tokensLeft = safeSub(swarm.totalSupply(), SWARMSentToETH); // calculats amounts of remaining tokens

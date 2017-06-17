@@ -101,7 +101,9 @@
 
   }
 
-
+ /*
+  *  The SWARM Token 
+  */
 
   contract SWARM is ERC20, SafeMath, Ownable {
 
@@ -265,7 +267,7 @@
           maxCap = 20000000 * multiplier;
       }
 
-
+      // specify address of token contract
       function updateTokenAddress(SWARM _SWARMAddress) public onlyBy(owner) returns(bool) {
 
           swarm = _SWARMAddress;
@@ -277,8 +279,10 @@
       /// {fallback function}  
       /// @notice It will call internal function which handels allocation of Ether and calculates SWARM tokens.   
       function () payable {
+          // use this for live
+          //if (block.number > endBlock ) throw;
           if (now > endBlock) throw;
-          handleETH(msg.sender);
+          handleETH(msg.sender); 
       }
 
 
@@ -325,7 +329,7 @@
       /// @notice It is called by CalculateNoOfTokens to determine the price in case purchase spans more than
       /// one pricing range. 
       /// @param _range {uint} current range computed
-      /// @return 
+      /// @return _amount, _totalTokensSold, _tokensToPurchase  {uint, uint, uint}
       function calaculateSpan(uint _range, uint _price, uint _totalTokensSold, uint _amount, uint _tokensToPurchase) internal constant returns(uint, uint, uint) {
 
           uint tokensLeft = _range - _totalTokensSold;
@@ -354,7 +358,7 @@
       /// calcuateNoOfTokensToSend 
       /// @notice It is called by handleETH to determine amount of tokens for given contribution
       /// @param _amount {uint} current range computed
-      /// @return tokensToPurchase {uintl} true if transaction was successful
+      /// @return tokensToPurchase {uint} true if transaction was successful
 
       function calcuateNoOfTokensToSend(uint _amount) internal returns(uint) {
 
@@ -398,8 +402,7 @@
       /// it will only execute if predetermined sale time passed.     
       function finalize() onlyBy(owner) {
 
-          if (now < endBlock) throw; // Can only be finilized if 30 days passed
-          // investors have 15 days to get their funds back before this can be executed
+          if (now < endBlock) throw; // Can only be finilized if 30 days passed         
           if (!multisigETH.send(this.balance)) throw; // moves the remaining ETH to the multisig address
 
 

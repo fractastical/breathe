@@ -5,7 +5,7 @@ import "./SafeMath.sol";
 import "./ERC20.sol";
 
  /*
-  *  The SWARM Token created with the time at which the crowdsale ends
+  *  The SWARM Token 
   */
 
 contract SWARM is ERC20, SafeMath, Ownable {
