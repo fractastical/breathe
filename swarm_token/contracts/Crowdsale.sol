@@ -215,14 +215,12 @@ import "./Pausable.sol";
           // investors have 15 days to get their funds back before this can be executed
           if (!multisigETH.send(this.balance)) throw; // moves the remaining ETH to the multisig address
 
-
           uint tokensLeft = safeSub(swarm.totalSupply(), SWARMSentToETH); // calculats amounts of remaining tokens
           if (!swarm.transfer(team, tokensLeft)) throw;
 
           swarm.transfer(team, tokensLeft);
-
           swarm.unlock();
-          //  crowdsaleClosed = true;
+          crowdsaleClosed = true;
       }
 
 

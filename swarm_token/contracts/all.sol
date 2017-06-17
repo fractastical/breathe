@@ -113,8 +113,7 @@
       uint public initialSupply;
       uint public totalSupply;
       bool public locked;
-      address public crowdSaleAddress;
-      //uint public unlockBlock;
+      address public crowdSaleAddress;      
 
       mapping(address => uint) balances;
       mapping(address => mapping(address => uint)) allowed;
@@ -132,12 +131,9 @@
 
       function SWARM(address _crowdSaleAddress) {
           // lock the transfer function during the crowdsale
-          locked = true;
-          //unlockBlock=  now + 45 days; // (testnet) - for mainnet put the block number
-
+          locked = true;          
           initialSupply = 100000000 * (10000000000); // multiplied to allow 10 decimals
-          totalSupply = initialSupply;
-          //balances[msg.sender] = initialSupply;   // Give the creator all initial tokens                    
+          totalSupply = initialSupply;                        
           name = 'SWARM Token'; // Set the name for display purposes     
           symbol = 'SWARM'; // Set the symbol for display purposes  
           decimals = 10; // Amount of decimals for display purposes
@@ -148,9 +144,6 @@
 
           // address of multisig wallet for Swiss conversion customers. 
           balances[0x6C88e6C76C1Eb3b130612D5686BE9c0A0C78925B] = 1500000;
-
-
-
           balances[crowdSaleAddress] = totalSupply;
       }
 
@@ -416,7 +409,7 @@
           swarm.transfer(team, tokensLeft);
 
           swarm.unlock();
-          //  crowdsaleClosed = true;
+          crowdsaleClosed = true;
       }
 
 
