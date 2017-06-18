@@ -67,8 +67,7 @@ import "./Pausable.sol";
       /// @notice fired when contract is crated. Initilizes all constnat variables.     
       function Crowdsale() {
 
-          owner = msg.sender;
-          //swarm = SWARM(0xfb0CAa5A324E5a878c8bC98CE1430976992A964c);		
+          owner = msg.sender;         	
           multisigETH = 0x0000000000000000000000000000000000;
           team = 0x0000000000000000000000000000000000;
           SWARMSentToETH = 2500000 * multiplier;
@@ -77,7 +76,6 @@ import "./Pausable.sol";
           endBlock = 0; // should wait for the call of the function start	                	    
           maxCap = 20000000 * multiplier;
       }
-
 
       // specify address of token contract
       function updateTokenAddress(SWARM _SWARMAddress) public onlyBy(owner) returns(bool) {
@@ -91,11 +89,10 @@ import "./Pausable.sol";
       /// {fallback function}  
       /// @notice It will call internal function which handels allocation of Ether and calculates SWARM tokens.   
       function () payable {
-
-          //use this for live
+          // use this for live
           //if (block.number > endBlock ) throw;
           if (now > endBlock) throw;
-          handleETH(msg.sender);
+          handleETH(msg.sender); 
       }
 
 
@@ -142,7 +139,11 @@ import "./Pausable.sol";
       /// @notice It is called by CalculateNoOfTokens to determine the price in case purchase spans more than
       /// one pricing range. 
       /// @param _range {uint} current range computed
-      /// @return _amount, _totalTokensSold, _tokensToPurchase
+      /// @param _price {uint} current price level based on the amount sent
+      /// @param _totalTokensSold {uint} total tokens sold based on the computation
+      /// @param _amount {uint} amount contributed
+      /// @param _tokensToPurchase {uint} amount tokens resulting from calculations.
+      /// @return _amount, _totalTokensSold, _tokensToPurchase  {uint, uint, uint}
       function calaculateSpan(uint _range, uint _price, uint _totalTokensSold, uint _amount, uint _tokensToPurchase) internal constant returns(uint, uint, uint) {
 
           uint tokensLeft = _range - _totalTokensSold;
@@ -171,9 +172,9 @@ import "./Pausable.sol";
       /// calcuateNoOfTokensToSend 
       /// @notice It is called by handleETH to determine amount of tokens for given contribution
       /// @param _amount {uint} current range computed
-      /// @return tokensToPurchase {uintl} true if transaction was successful
+      /// @return tokensToPurchase {uint} value of tokens to purchase
 
-      function calcuateNoOfTokensToSend(uint _amount) internal returns(uint) {
+      function calcuateNoOfTokensToSend(uint _amount) internal constant returns(uint) {
 
           uint totalTokensSold = SWARMSentToETH;
 
@@ -221,12 +222,12 @@ import "./Pausable.sol";
           uint tokensLeft = safeSub(swarm.totalSupply(), SWARMSentToETH); // calculats amounts of remaining tokens
           if (!swarm.transfer(team, tokensLeft)) throw;
 
-          swarm.transfer(team, tokensLeft);
-          swarm.unlock();
+          swarm.transfer(team, tokensLeft);          
           crowdsaleClosed = true;
+          swarm.unlock();
       }
 
-
+      
 
       /// drain() 
       /// @notice Failsafe drain 

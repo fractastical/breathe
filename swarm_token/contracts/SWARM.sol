@@ -4,11 +4,12 @@ import "./Ownable.sol";
 import "./SafeMath.sol";
 import "./ERC20.sol";
 
- /*
+  
+  /*
   *  The SWARM Token 
   */
 
-contract SWARM is ERC20, SafeMath, Ownable {
+  contract SWARM is ERC20, SafeMath, Ownable {
 
       /* Public variables of the token */
       string public name;
@@ -19,6 +20,7 @@ contract SWARM is ERC20, SafeMath, Ownable {
       uint public totalSupply;
       bool public locked;
       address public crowdSaleAddress;      
+      
 
       mapping(address => uint) balances;
       mapping(address => mapping(address => uint)) allowed;
@@ -30,12 +32,56 @@ contract SWARM is ERC20, SafeMath, Ownable {
       }
 
 
+      modifier checkTransferConditions(uint tokensToBeMoved){
+          
+        // only allow transfer of tokens by crowd sale contract during crowdsale 
+        if (msg.sender != crowdSaleAddress  && locked ) throw;
+        
+        // allow transfer of tokens by the owner or enforce withdrawing rules.
+        // Over a year investor can move all their tokens in 42 days intervals,
+        // 9% each time or cumulative value for prior periods. 
+        // first withdrawla will be available after 7 days. 
+        
+        if (msg.sender != owner && msg.sender!= crowdSaleAddress) {
+           
+         
+        uint fourtyTwoDays = 42 * 24 * 60 * 4;
+        uint sevenDays = 7 * 24 * 60 * 4;
+        //uint percentile = 9;
+        Crowdsale crowdSale = Crowdsale(crowdSaleAddress);
+        var (, initialTokens) = crowdSale.investors(msg.sender);
+        //uint startBlock = crowdSale.endBlock() + sevenDays;
+         
+        uint balance = balances[msg.sender] - initialTokens;
+         
+        // calculate number of block based on 42 days length and end date of crowd sale.
+        uint i = ((block.number - crowdSale.endBlock() + sevenDays )/ fourtyTwoDays) + 1;
+        
+        // determine tokens number to be moved in case user received some
+        // tokens in meantime after crowdsale ended. 
+        if (balance < tokensToBeMoved)
+          tokensToBeMoved -= balance;
+        else 
+          tokensToBeMoved = 0;         
+      
+       // determine if amount of tokens to be moved is not larger than 
+       // 1/9 * i   
+            if (tokensToBeMoved * 100 / initialTokens > 9 * i)
+              throw;
+        }
+            
+             _;
+                
+      }
+      
+      
+   
       /*
        *  The SWARM Token created with the time at which the crowdsale ends
        */
 
       function SWARM(address _crowdSaleAddress) {
-          // lock the transfer function during the crowdsale
+          // lock the transfCrowdsaleer function during the crowdsale
           locked = true;          
           initialSupply = 100000000 * (10000000000); // multiplied to allow 10 decimals
           totalSupply = initialSupply;                        
@@ -58,14 +104,14 @@ contract SWARM is ERC20, SafeMath, Ownable {
 
 
 
-      function transfer(address _to, uint _value) onlyUnlocked returns(bool) {
+      function transfer(address _to, uint _value) checkTransferConditions(_value) returns(bool) {
           balances[msg.sender] = safeSub(balances[msg.sender], _value);
           balances[_to] = safeAdd(balances[_to], _value);
           Transfer(msg.sender, _to, _value);
           return true;
       }
 
-      function transferFrom(address _from, address _to, uint _value) onlyUnlocked returns(bool) {
+      function transferFrom(address _from, address _to, uint _value) checkTransferConditions(_value) returns(bool) {
           var _allowance = allowed[_from][msg.sender];
 
           balances[_to] = safeAdd(balances[_to], _value);
