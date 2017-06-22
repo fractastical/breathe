@@ -20,29 +20,6 @@ var web3 = new Web3();
 web3.setProvider(new web3.providers.HttpProvider('http://localhost:8545'));
 
 
-
-String.prototype.toHHMMSS = function () {
-    var sec_num = parseInt(this, 10); // don't forget the second param
-    var hours = Math.floor(sec_num / 3600);
-    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-    var seconds = sec_num - (hours * 3600) - (minutes * 60);
-    var hoursInt = hours;
-    var days = Math.floor(hours / 24);
-
-    if (hours < 10) { hours = "0" + hours; }
-    if (minutes < 10) { minutes = "0" + minutes; }
-    if (seconds < 10) { seconds = "0" + seconds; }
-
-    if (hoursInt < 0) { return "Start new bidding" }
-    else if (days == 0) {
-        return hours + ':' + minutes + ':' + seconds;
-    }
-    else
-        return days + " days";
-}
-
-
-
 app.use(express.static('public'));
 
 // parse application/x-www-form-urlencoded
