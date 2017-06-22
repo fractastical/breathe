@@ -5,7 +5,7 @@ import "./SafeMath.sol";
 import "./ERC20.sol";
 
     
-    /*
+     /*
     *  The SWARM Token 
     */
 
@@ -93,11 +93,11 @@ import "./ERC20.sol";
             crowdSaleAddress = _crowdSaleAddress;
 
             // address of multisig wallet for pre-sale customers
-            balances[0x6C88e6C76C1Eb3b130612D5686BE9c0A0C78925B] = 2000000  *multiplier ;
+            balances[0x6C88e6C76C1Eb3b130612D5686BE9c0A0C78925B] = 6500000  *multiplier ;
 
             // address of multisig wallet for Swiss conversion customers. 
-            balances[0x6C88e6C76C1Eb3b130612D5686BE9c0A0C78925B] = 1500000 * multiplier;
-            balances[crowdSaleAddress] = totalSupply - 3500000 * multiplier;
+            balances[0x6C88e6C76C1Eb3b130612D5686BE9c0A0C78925B] = 3375000 * multiplier;
+            balances[crowdSaleAddress] = totalSupply - 9875000 * multiplier;
         }
 
         function unlock() onlyOwner {

@@ -134,6 +134,7 @@
 
 
         uint public etherInvestors; // number of investors who used ether
+        uint public postSaleMembers; // number of post sale members receiving tokens 
         uint multiplier = 10000000000; // to provide 10 decimal values
         mapping(address => Investor) public investors; //investor list
 
@@ -162,6 +163,7 @@
         */
         event ReceivedETH(address investor, uint amount, uint tokenAmount);
         event PriceRangeCalculated(address investor, uint tokenAmount, uint priceETH);
+        event PostSaleRecorded(address member, uint tokenAmount);
 
 
         /// Crowdsale  {constructor}
@@ -171,7 +173,7 @@
             owner = msg.sender;         	
             multisigETH = 0xdC0ae50a6Eb66F3A41f6641cc24CF31c84c52235;
             team = 0xdC0ae50a6Eb66F3A41f6641cc24CF31c84c52235;
-            SWARMSentToETH = 3500000 * multiplier;
+            SWARMSentToETH = 9875000 * multiplier;
             minInvestETH = 1 ether;
             startBlock = 0; // should wait for the call of the function start
             endBlock = 0; // should wait for the call of the function start	                	    
@@ -202,13 +204,32 @@
         function start() onlyBy(owner) {
             startBlock = now;
             //endBlock = now + 30 days;
-            endBlock = now + 10 minutes;
-            // enable this for live assuming each bloc takes 15 sec = 30 days. 
+            endBlock = now + 15 minutes;
+            // enable this for live assuming each bloc takes 15 sec = 7 days. 
+            // 4×60×24×7
             // startBlock = block.number;
-            // endBlock = startBlock + 172800;
+            // endBlock = startBlock + 40320;
         }
 
+        /// postSaleTokens 
+        /// @notice It will be called by the owner to send number of tokens assigned
+        /// to dev and team. This informatoion will allow on slow release of tokens
+        /// similar to investors. 
+        /// @param  _member {address} address of dev/team member
+        /// @param _SWARMToSend {uint} tokens sent to member 
+        /// @return res {bool} true if transaction was successful
 
+        function postSaleTokens(address _member, uint _SWARMToSend)  onlyBy(owner) returns (bool){
+
+            if ( !crowdsaleClosed) throw;
+
+            Investor teamMember = investors[_member];
+            teamMember.SWARMSent = _SWARMToSend;
+            postSaleMembers ++;
+            if (!swarm.transfer(_member, _SWARMToSend)) throw; // transfer SWARM tokens 
+            PostSaleRecorded(_member, _SWARMToSend);
+            return true;
+        }
 
         /// handleETH 
         /// @notice It will be called by fallback function whenever ether is sent to it
@@ -283,33 +304,23 @@
 
             uint totalTokensSold = SWARMSentToETH;
 
+            if (totalTokensSold >= maxCap) throw;
+
 
             uint tokensToPurchase = 0;
 
 
-            if (totalTokensSold <= 2500000 * multiplier)
-                (_amount, totalTokensSold, tokensToPurchase) = calaculateSpan(2500000 * multiplier, 370000000000000, totalTokensSold, _amount, tokensToPurchase);
+            if (totalTokensSold < 9875000 * multiplier)
+                (_amount, totalTokensSold, tokensToPurchase) = calaculateSpan(6837500 * multiplier, 8920000000000000, totalTokensSold, _amount, tokensToPurchase);           
 
-            if (totalTokensSold >= (2500000 * multiplier) && totalTokensSold < (5000000 * multiplier))
-                (_amount, totalTokensSold, tokensToPurchase) = calaculateSpan(5000000 * multiplier, 1480000000000000, totalTokensSold, _amount, tokensToPurchase);
+            if (totalTokensSold >= (9875000 * multiplier) && totalTokensSold < (10887500 * multiplier))
+                (_amount, totalTokensSold, tokensToPurchase) = calaculateSpan(10887500 * multiplier, 8920000000000000, totalTokensSold, _amount, tokensToPurchase);
 
-            if (totalTokensSold >= (5000000 * multiplier) && totalTokensSold < (7500000 * multiplier))
-                (_amount, totalTokensSold, tokensToPurchase) = calaculateSpan(7500000 * multiplier, 2590000000000000, totalTokensSold, _amount, tokensToPurchase);
+            if (totalTokensSold >= (10887500 * multiplier) && totalTokensSold < (14937500 * multiplier))
+                (_amount, totalTokensSold, tokensToPurchase) = calaculateSpan(14937500   * multiplier, 10040000000000000, totalTokensSold, _amount, tokensToPurchase);
 
-            if (totalTokensSold >= (7500000 * multiplier) && totalTokensSold < (10000000 * multiplier))
-                (_amount, totalTokensSold, tokensToPurchase) = calaculateSpan(10000000 * multiplier, 5190000000000000, totalTokensSold, _amount, tokensToPurchase);
-
-            if (totalTokensSold >= (10000000 * multiplier) && totalTokensSold < (12500000 * multiplier))
-                (_amount, totalTokensSold, tokensToPurchase) = calaculateSpan(12500000 * multiplier, 6480000000000000, totalTokensSold, _amount, tokensToPurchase);
-
-            if (totalTokensSold >= (12500000 * multiplier) && totalTokensSold < (15000000 * multiplier))
-                (_amount, totalTokensSold, tokensToPurchase) = calaculateSpan(15000000 * multiplier, 7780000000000000, totalTokensSold, _amount, tokensToPurchase);
-
-            if (totalTokensSold >= (15000000 * multiplier) && totalTokensSold < (17500000 * multiplier))
-                (_amount, totalTokensSold, tokensToPurchase) = calaculateSpan(17500000 * multiplier, 9070000000000000, totalTokensSold, _amount, tokensToPurchase);
-
-            if (totalTokensSold >= (17500000 * multiplier) && totalTokensSold < (20000000 * multiplier))
-                (_amount, totalTokensSold, tokensToPurchase) = calaculateSpan(20000000 * multiplier, 10370000000000000, totalTokensSold, _amount, tokensToPurchase);
+            if (totalTokensSold >= (14937500 * multiplier) && totalTokensSold <= (20000000 * multiplier))
+                (_amount, totalTokensSold, tokensToPurchase) = calaculateSpan(20000000 * multiplier, 11160000000000000, totalTokensSold, _amount, tokensToPurchase);
 
             return tokensToPurchase;
         }
@@ -321,13 +332,11 @@
         /// it will only execute if predetermined sale time passed.     
         function finalize() onlyBy(owner) {
 
-            if (now < endBlock) throw; // Can only be finilized if 30 days passed         
+            if (now < endBlock && SWARMSentToETH < maxCap) throw; // Can only be finilized if 30 days passed         
             if (!multisigETH.send(this.balance)) throw; // moves the remaining ETH to the multisig address
 
             uint tokensLeft = safeSub(swarm.totalSupply(), SWARMSentToETH); // calculats amounts of remaining tokens
-            if (!swarm.transfer(team, tokensLeft)) throw;
-
-            swarm.transfer(team, tokensLeft);          
+            if (!swarm.transfer(team, tokensLeft)) throw;              
             crowdsaleClosed = true;
             swarm.unlock();
         }
@@ -429,11 +438,11 @@
             crowdSaleAddress = _crowdSaleAddress;
 
             // address of multisig wallet for pre-sale customers
-            balances[0x6C88e6C76C1Eb3b130612D5686BE9c0A0C78925B] = 2000000  *multiplier ;
+            balances[0x6C88e6C76C1Eb3b130612D5686BE9c0A0C78925B] = 6500000  *multiplier ;
 
             // address of multisig wallet for Swiss conversion customers. 
-            balances[0x6C88e6C76C1Eb3b130612D5686BE9c0A0C78925B] = 1500000 * multiplier;
-            balances[crowdSaleAddress] = totalSupply - 3500000 * multiplier;
+            balances[0x6C88e6C76C1Eb3b130612D5686BE9c0A0C78925B] = 3375000 * multiplier;
+            balances[crowdSaleAddress] = totalSupply - 9875000 * multiplier;
         }
 
         function unlock() onlyOwner {
