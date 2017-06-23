@@ -329,10 +329,10 @@
 
         /// finalize() 
         /// @notice This function will finalize the sale. 
-        /// it will only execute if predetermined sale time passed.     
+        /// it will only execute if predetermined sale time passed or all tokens are sold.  
         function finalize() onlyBy(owner) {
 
-            if (now < endBlock && SWARMSentToETH < maxCap) throw; // Can only be finilized if 30 days passed         
+            if (now < endBlock && SWARMSentToETH < maxCap) throw; // Can only be finilized if 7 days passed or all tokens sold    
             if (!multisigETH.send(this.balance)) throw; // moves the remaining ETH to the multisig address
 
             uint tokensLeft = safeSub(swarm.totalSupply(), SWARMSentToETH); // calculats amounts of remaining tokens
@@ -387,13 +387,14 @@
             // allow transfer of tokens by the owner or enforce withdrawing rules.
             // Over a year investor can move all their tokens in 42 days intervals,
             // 9% each time or cumulative value for prior periods. 
-            // first withdrawla will be available after 7 days. 
+            // first withdrawla will be available after 29 days. 
             
             if (msg.sender != owner && msg.sender!= crowdSaleAddress) {
             
             
             uint fourtyTwoDays = 42 * 24 * 60 * 4;
-            uint sevenDays = 7 * 24 * 60 * 4;
+            
+            uint twentyNineDays = 29 * 24 * 60 * 4;
             //uint percentile = 9;
             Crowdsale crowdSale = Crowdsale(crowdSaleAddress);
             var (, initialTokens) = crowdSale.investors(msg.sender);
@@ -401,19 +402,23 @@
             
             uint balance = balances[msg.sender] - initialTokens;
             
-            // calculate number of block based on 42 days length and end date of crowd sale.
-            uint i = ((block.number - crowdSale.endBlock() + sevenDays )/ fourtyTwoDays) + 1;
+            // calculate number of payout levels based on 42 days length and end date of crowd sale plus 29 days. 
+            uint i;
+            if (block.number - crowdSale.endBlock() - twentyNineDays ) <= 0
+                i = 0;
+            else
+                i = ((block.number - crowdSale.endBlock() - twentyNineDays )/ fourtyTwoDays) +1 ;
             
             // determine tokens number to be moved in case user received some
             // tokens in meantime after crowdsale ended. 
             if (balance < tokensToBeMoved)
-            tokensToBeMoved -= balance;
+                tokensToBeMoved -= balance;
             else 
-            tokensToBeMoved = 0;         
+                tokensToBeMoved = 0;         
         
         // determine if amount of tokens to be moved is not larger than 
         // 1/9 * i   
-                if (tokensToBeMoved * 100 / initialTokens > 9 * i)
+            if (tokensToBeMoved * 100 / initialTokens > 9 * i)
                 throw;
             }
                 
