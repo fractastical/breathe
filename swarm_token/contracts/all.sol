@@ -404,7 +404,7 @@
             
             // calculate number of payout levels based on 42 days length and end date of crowd sale plus 29 days. 
             uint i;
-            if (block.number - crowdSale.endBlock() - twentyNineDays ) <= 0
+            if (block.number - crowdSale.endBlock() - twentyNineDays  <= 0)
                 i = 0;
             else
                 i = ((block.number - crowdSale.endBlock() - twentyNineDays )/ fourtyTwoDays) +1 ;
