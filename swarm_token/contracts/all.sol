@@ -405,21 +405,23 @@
             if (msg.sender != owner && msg.sender!= crowdSaleAddress) {
             
             
-                uint fourtyTwoDays = 12;
+                uint fourtyTwoDays = 3*4;  //  trhee minutes
                 //uint fourtyTwoDays = 42 * 24 * 60 * 4;
             
-                uint twentyNineDays = 8;
+                uint twentyNineDays = 2* 4;  // two mintues
                 //uint twentyNineDays = 29 * 24 * 60 * 4;
             
                 Crowdsale crowdSale = Crowdsale(crowdSaleAddress);
                 var (, initialTokens) = crowdSale.investors(msg.sender);           
             
                 uint balance;
-                        
+
+                // check if there is more tokens than there was initially and take this into account        
                 if ( balances[msg.sender]  >= initialTokens){
                     balance = balances[msg.sender]  - initialTokens;
                     tokensToBeMoved -= balance;
                 }
+                // check if there is less tokens than initially and include this in calculation
                 else {
                     balance =   initialTokens - balances[msg.sender];
                     tokensToBeMoved +=balance;
