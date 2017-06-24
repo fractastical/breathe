@@ -151,10 +151,8 @@
         /// respectTimeFrame
         /// @notice to verify if action is not performed out of the campaing range    
         modifier respectTimeFrame() {
-            if ((now < startBlock) || (now > endBlock)) throw;
-
-            //enable this for live
-            // if ((block.number <= startBlock) || (block.number > endBlock) throw;)
+            if ((block.number < startBlock) || (block.number > endBlock)) throw;
+            
             _;
         }
 
@@ -166,6 +164,10 @@
         event PostSaleRecorded(address member, uint tokenAmount);
 
 
+       
+              
+                    
+        
         /// Crowdsale  {constructor}
         /// @notice fired when contract is crated. Initilizes all constnat variables.     
         function Crowdsale() {
@@ -192,23 +194,23 @@
         /// {fallback function}  
         /// @notice It will call internal function which handels allocation of Ether and calculates SWARM tokens.   
         function () payable {
-            // use this for live
-            //if (block.number > endBlock ) throw;
-            if (now > endBlock) throw;
-            handleETH(msg.sender); 
+
+            if (block.number > endBlock) throw;
+                handleETH(msg.sender); 
         }
 
 
         /// start 
         /// @notice It will be called by owner to start the sale  
-        function start() onlyBy(owner) {
-            startBlock = now;
-            //endBlock = now + 30 days;
-            endBlock = now + 15 minutes;
+        function start() onlyBy(owner) {            
+                        
+             startBlock = block.number;
+             endBlock = startBlock + 20;
+
             // enable this for live assuming each bloc takes 15 sec = 7 days. 
             // 4×60×24×7
-            // startBlock = block.number;
-            // endBlock = startBlock + 40320;
+            // 
+            //endBlock = startBlock + 4×60×24×7;
         }
 
         /// postSaleTokens 
@@ -332,7 +334,7 @@
         /// it will only execute if predetermined sale time passed or all tokens are sold.  
         function finalize() onlyBy(owner) {
 
-            if (now < endBlock && SWARMSentToETH < maxCap) throw; // Can only be finilized if 7 days passed or all tokens sold    
+            if (block.number < endBlock && SWARMSentToETH < maxCap) throw; // Can only be finilized if 7 days passed or all tokens sold    
             if (!multisigETH.send(this.balance)) throw; // moves the remaining ETH to the multisig address
 
             uint tokensLeft = safeSub(swarm.totalSupply(), SWARMSentToETH); // calculats amounts of remaining tokens
@@ -376,7 +378,18 @@
             if (msg.sender != crowdSaleAddress && locked) throw;
             _;
         }
+        
+          modifier onlyAuthorized(){
 
+             if (msg.sender != owner && msg.sender!= crowdSaleAddress)
+                throw;
+
+             _;
+
+        }
+        
+       
+        event MoneyTransferred(uint nowTime, uint startBlock, uint fourtytwodays, uint twentyNineDays, uint percentile, uint initialTokens, uint balance );
 
         modifier checkTransferConditions(uint tokensToBeMoved){
             
@@ -392,40 +405,43 @@
             if (msg.sender != owner && msg.sender!= crowdSaleAddress) {
             
             
-            uint fourtyTwoDays = 42 * 24 * 60 * 4;
+                uint fourtyTwoDays = 12;
+                //uint fourtyTwoDays = 42 * 24 * 60 * 4;
             
-            uint twentyNineDays = 29 * 24 * 60 * 4;
-            //uint percentile = 9;
-            Crowdsale crowdSale = Crowdsale(crowdSaleAddress);
-            var (, initialTokens) = crowdSale.investors(msg.sender);
-            //uint startBlock = crowdSale.endBlock() + sevenDays;
+                uint twentyNineDays = 8;
+                //uint twentyNineDays = 29 * 24 * 60 * 4;
             
-            uint balance = balances[msg.sender] - initialTokens;
+                Crowdsale crowdSale = Crowdsale(crowdSaleAddress);
+                var (, initialTokens) = crowdSale.investors(msg.sender);           
             
-            // calculate number of payout levels based on 42 days length and end date of crowd sale plus 29 days. 
-            uint i;
-            if (block.number - crowdSale.endBlock() - twentyNineDays  <= 0)
-                i = 0;
-            else
-                i = ((block.number - crowdSale.endBlock() - twentyNineDays )/ fourtyTwoDays) +1 ;
+                uint balance;
+                        
+                if ( balances[msg.sender]  >= initialTokens){
+                    balance = balances[msg.sender]  - initialTokens;
+                    tokensToBeMoved -= balance;
+                }
+                else {
+                    balance =   initialTokens - balances[msg.sender];
+                    tokensToBeMoved +=balance;
+                }
+                        
+                // calculate number of payout levels based on 42 days length and end date of crowd sale plus 29 days. 
+                uint i;
+                if (block.number - crowdSale.endBlock() - twentyNineDays  <= 0)
+                    i = 0;
+                else
+                    i = ((block.number - crowdSale.endBlock() - twentyNineDays )/ fourtyTwoDays) +1 ;
+                                                
+                // determine if amount of tokens to be moved is not larger than 
+                // 1/9 * i   
+
             
-            // determine tokens number to be moved in case user received some
-            // tokens in meantime after crowdsale ended. 
-            if (balance < tokensToBeMoved)
-                tokensToBeMoved -= balance;
-            else 
-                tokensToBeMoved = 0;         
-        
-        // determine if amount of tokens to be moved is not larger than 
-        // 1/9 * i   
-            if (tokensToBeMoved * 100 / initialTokens > 9 * i)
-                throw;
+                if (tokensToBeMoved * 100 / initialTokens > 9 * i)
+                    throw;
             }
-                
-                _;
-                    
+                            
+         _;
         }
-        
         
     
         /*
@@ -450,7 +466,7 @@
             balances[crowdSaleAddress] = totalSupply - 9875000 * multiplier;
         }
 
-        function unlock() onlyOwner {
+          function unlock() onlyAuthorized {
             locked = false;
         }
 

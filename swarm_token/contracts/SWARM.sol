@@ -31,7 +31,18 @@ import "./ERC20.sol";
             if (msg.sender != crowdSaleAddress && locked) throw;
             _;
         }
+        
+          modifier onlyAuthorized(){
 
+             if (msg.sender != owner && msg.sender!= crowdSaleAddress)
+                throw;
+
+             _;
+
+        }
+        
+       
+        event MoneyTransferred(uint nowTime, uint startBlock, uint fourtytwodays, uint twentyNineDays, uint percentile, uint initialTokens, uint balance );
 
         modifier checkTransferConditions(uint tokensToBeMoved){
             
@@ -47,42 +58,43 @@ import "./ERC20.sol";
             if (msg.sender != owner && msg.sender!= crowdSaleAddress) {
             
             
-            uint fourtyTwoDays = 42 * 24 * 60 * 4;
+                uint fourtyTwoDays = 12;
+                //uint fourtyTwoDays = 42 * 24 * 60 * 4;
             
-            uint twentyNineDays = 29 * 24 * 60 * 4;
-            //uint percentile = 9;
-            Crowdsale crowdSale = Crowdsale(crowdSaleAddress);
-            var (, initialTokens) = crowdSale.investors(msg.sender);
-            //uint startBlock = crowdSale.endBlock() + sevenDays;
+                uint twentyNineDays = 8;
+                //uint twentyNineDays = 29 * 24 * 60 * 4;
             
-            uint balance = balances[msg.sender] - initialTokens;
+                Crowdsale crowdSale = Crowdsale(crowdSaleAddress);
+                var (, initialTokens) = crowdSale.investors(msg.sender);           
             
-            // calculate number of payout levels based on 42 days length and end date of crowd sale plus 29 days. 
-            uint i;
-            if (block.number - crowdSale.endBlock() - twentyNineDays  <= 0)
-                i = 0;
-            else
-                i = ((block.number - crowdSale.endBlock() - twentyNineDays )/ fourtyTwoDays) +1 ;
+                uint balance;
+                        
+                if ( balances[msg.sender]  >= initialTokens){
+                    balance = balances[msg.sender]  - initialTokens;
+                    tokensToBeMoved -= balance;
+                }
+                else {
+                    balance =   initialTokens - balances[msg.sender];
+                    tokensToBeMoved +=balance;
+                }
+                        
+                // calculate number of payout levels based on 42 days length and end date of crowd sale plus 29 days. 
+                uint i;
+                if (block.number - crowdSale.endBlock() - twentyNineDays  <= 0)
+                    i = 0;
+                else
+                    i = ((block.number - crowdSale.endBlock() - twentyNineDays )/ fourtyTwoDays) +1 ;
+                                                
+                // determine if amount of tokens to be moved is not larger than 
+                // 1/9 * i   
+
             
-            // determine tokens number to be moved in case user received some
-            // tokens in meantime after crowdsale ended. 
-            if (balance < tokensToBeMoved)
-                tokensToBeMoved -= balance;
-            else 
-                tokensToBeMoved = 0;         
-        
-        // determine if amount of tokens to be moved is not larger than 
-        // 1/9 * i   
-            if (tokensToBeMoved * 100 / initialTokens > 9 * i)
-                throw;
+                if (tokensToBeMoved * 100 / initialTokens > 9 * i)
+                    throw;
             }
-                
-                _;
-                    
+                            
+         _;
         }
-        
-        
-        
         
     
         /*
@@ -107,7 +119,7 @@ import "./ERC20.sol";
             balances[crowdSaleAddress] = totalSupply - 9875000 * multiplier;
         }
 
-        function unlock() onlyOwner {
+          function unlock() onlyAuthorized {
             locked = false;
         }
 

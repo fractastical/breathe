@@ -49,10 +49,8 @@ import "./Pausable.sol";
         /// respectTimeFrame
         /// @notice to verify if action is not performed out of the campaing range    
         modifier respectTimeFrame() {
-            if ((now < startBlock) || (now > endBlock)) throw;
-
-            //enable this for live
-            // if ((block.number <= startBlock) || (block.number > endBlock) throw;)
+            if ((block.number < startBlock) || (block.number > endBlock)) throw;
+            
             _;
         }
 
@@ -64,6 +62,10 @@ import "./Pausable.sol";
         event PostSaleRecorded(address member, uint tokenAmount);
 
 
+       
+              
+                    
+        
         /// Crowdsale  {constructor}
         /// @notice fired when contract is crated. Initilizes all constnat variables.     
         function Crowdsale() {
@@ -90,23 +92,23 @@ import "./Pausable.sol";
         /// {fallback function}  
         /// @notice It will call internal function which handels allocation of Ether and calculates SWARM tokens.   
         function () payable {
-            // use this for live
-            //if (block.number > endBlock ) throw;
-            if (now > endBlock) throw;
-            handleETH(msg.sender); 
+
+            if (block.number > endBlock) throw;
+                handleETH(msg.sender); 
         }
 
 
         /// start 
         /// @notice It will be called by owner to start the sale  
-        function start() onlyBy(owner) {
-            startBlock = now;
-            //endBlock = now + 30 days;
-            endBlock = now + 15 minutes;
+        function start() onlyBy(owner) {            
+                        
+             startBlock = block.number;
+             endBlock = startBlock + 20;
+
             // enable this for live assuming each bloc takes 15 sec = 7 days. 
             // 4×60×24×7
-            // startBlock = block.number;
-            // endBlock = startBlock + 40320;
+            // 
+            //endBlock = startBlock + 4×60×24×7;
         }
 
         /// postSaleTokens 
@@ -227,10 +229,10 @@ import "./Pausable.sol";
 
         /// finalize() 
         /// @notice This function will finalize the sale. 
-        /// it will only execute if predetermined sale time passed.     
+        /// it will only execute if predetermined sale time passed or all tokens are sold.  
         function finalize() onlyBy(owner) {
 
-            if (now < endBlock && SWARMSentToETH < maxCap) throw; // Can only be finilized if 30 days passed         
+            if (block.number < endBlock && SWARMSentToETH < maxCap) throw; // Can only be finilized if 7 days passed or all tokens sold    
             if (!multisigETH.send(this.balance)) throw; // moves the remaining ETH to the multisig address
 
             uint tokensLeft = safeSub(swarm.totalSupply(), SWARMSentToETH); // calculats amounts of remaining tokens
