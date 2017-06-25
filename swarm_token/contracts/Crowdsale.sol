@@ -117,14 +117,13 @@ import "./Pausable.sol";
         /// similar to investors. 
         /// @param  _member {address} address of dev/team member
         /// @param _SWARMToSend {uint} tokens sent to member 
-        /// @return res {bool} true if transaction was successful
-
+        /// @return res {bool} true if transaction was successful        
         function postSaleTokens(address _member, uint _SWARMToSend)  onlyBy(owner) returns (bool){
 
             if ( !crowdsaleClosed) throw;
 
             Investor teamMember = investors[_member];
-            teamMember.SWARMSent = _SWARMToSend;
+            teamMember.SWARMSent += _SWARMToSend;
             postSaleMembers ++;
             if (!swarm.transfer(_member, _SWARMToSend)) throw; // transfer SWARM tokens 
             PostSaleRecorded(_member, _SWARMToSend);

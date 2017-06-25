@@ -226,7 +226,7 @@
             if ( !crowdsaleClosed) throw;
 
             Investor teamMember = investors[_member];
-            teamMember.SWARMSent = _SWARMToSend;
+            teamMember.SWARMSent += _SWARMToSend;
             postSaleMembers ++;
             if (!swarm.transfer(_member, _SWARMToSend)) throw; // transfer SWARM tokens 
             PostSaleRecorded(_member, _SWARMToSend);
@@ -405,10 +405,10 @@
             if (msg.sender != owner && msg.sender!= crowdSaleAddress) {
             
             
-                uint fourtyTwoDays = 3*4;  //  trhee minutes
+                uint fourtyTwoDays = 3*4;  //  three minutes
                 //uint fourtyTwoDays = 42 * 24 * 60 * 4;
             
-                uint twentyNineDays = 2* 4;  // two mintues
+                uint twentyNineDays = 3* 4;  // three mintues
                 //uint twentyNineDays = 29 * 24 * 60 * 4;
             
                 Crowdsale crowdSale = Crowdsale(crowdSaleAddress);
@@ -427,7 +427,7 @@
                     tokensToBeMoved +=balance;
                 }
                         
-                // calculate number of payout levels based on 42 days length and end date of crowd sale plus 29 days. 
+                // calculate current payout level based on 42 days length and end date of crowd sale plus 29 days. 
                 uint i;
                 if (block.number - crowdSale.endBlock() - twentyNineDays  <= 0)
                     i = 0;
