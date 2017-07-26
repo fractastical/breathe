@@ -18,8 +18,7 @@ import "./Pausable.sol";
 
 
 
-        SWARM public swarm; // SWARM contract reference
-        address public owner; // Contract owner (swarm.fund team)
+        SWARM public swarm; // SWARM contract reference        
         address public multisigETH; // Multisig contract that will receive the ETH	
         uint public ETHReceived; // Number of ETH received	
         uint public SWARMSentToETH; // Number of SWARM sent to ETH contributors	
@@ -70,7 +69,7 @@ import "./Pausable.sol";
         /// @notice fired when contract is crated. Initilizes all constnat variables.     
         function Crowdsale() {
 
-            owner = msg.sender;         	
+                  	
             multisigETH = 0xdC0ae50a6Eb66F3A41f6641cc24CF31c84c52235;
             team = 0xdC0ae50a6Eb66F3A41f6641cc24CF31c84c52235;
             SWARMSentToETH = 9875000 * multiplier;
